@@ -1,0 +1,7 @@
+{
+  "name": "cercafutur",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
