@@ -1,5 +1,5 @@
 # cercafutur
-CercaFutur és una aplicació multiplataforma, cercador d'escoles i instituts amb filtres avançats, un mapa i compte 
+CercaFutur és una aplicació per a mòbils; un cercador d'escoles i instituts amb filtres avançats, un mapa i compte 
 d'usuari. Creat amb Vue i Ionic Framework.
 
 # Requeriments
@@ -11,7 +11,7 @@ d'usuari. Creat amb Vue i Ionic Framework.
 ```shell
 git clone https://github.com/AFAIK-Technologies/cercafutur.git
 ```
-2. Instal·lar dependències
+2. Instal·lar dependències.
 ```shell
 cd cercafutur
 npm i
