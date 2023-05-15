@@ -1,6 +1,10 @@
 <template>
 	<ion-list>
-		<ion-item v-for="filter in filters">
+		<ion-item
+			v-for="filter in filters.filter((item) =>
+				noSliders ? item.type !== 'range' : true
+			)"
+		>
 			<ion-range
 				style="margin: 0 16px"
 				v-if="filter.type === 'range'"
@@ -11,6 +15,8 @@
 				:pin="true"
 				:step="filter.values.steps"
 				:disabled="!enabled"
+				@ionChange="filterData[filter.id] = $event.target.value"
+				:pin-formatter="filter.values.format"
 			>
 				<div slot="label">{{ filter.title }}</div>
 			</ion-range>
@@ -20,6 +26,7 @@
 				:multiple="filter.type === 'multiple'"
 				placeholder="Selecciona..."
 				:label="filter.title"
+				@ionChange="filterData[filter.id] = $event.target.value"
 			>
 				<ion-select-option v-for="option in filter.values" :value="option.id">{{
 					option.show
@@ -37,17 +44,27 @@ import {
 	IonList,
 	IonItem,
 } from '@ionic/vue';
-import { reactive } from 'vue';
+import { reactive, watch, watchEffect } from 'vue';
 
-const props = withDefaults(defineProps<{ enabled?: boolean }>(), {
-	enabled: true,
-});
+const emit = defineEmits(['filterChange']);
 
-const filterData = reactive({
+const props = withDefaults(
+	defineProps<{ enabled?: boolean; noSliders?: boolean }>(),
+	{
+		enabled: true,
+		noSliders: false,
+	}
+);
+
+const filterData: Object = reactive({
 	phase: null,
 	type: null,
 	distance: null,
 	score: null,
+});
+
+watch(filterData, () => {
+	emit('filterChange', filterData);
 });
 
 const filters: {
@@ -65,7 +82,7 @@ const filters: {
 		  };
 }[] = [
 	{
-		type: 'multiple',
+		type: 'single',
 		title: 'Etapa educativa',
 		id: 'phase',
 		values: [
@@ -76,6 +93,10 @@ const filters: {
 			{
 				show: 'ESO',
 				id: 'secondary',
+			},
+			{
+				show: 'Institut-escola',
+				id: 'both',
 			},
 		],
 	},
@@ -97,17 +118,6 @@ const filters: {
 				id: 'private',
 			},
 		],
-	},
-	{
-		type: 'range',
-		id: 'distance',
-		title: 'Distància màxima',
-		values: {
-			min: 0,
-			max: 5000,
-			snaps: true,
-			steps: 250,
-		},
 	},
 	{
 		type: 'range',

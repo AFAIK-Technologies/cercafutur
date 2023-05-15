@@ -13,6 +13,7 @@ http://ionicframework.com/docs/theming/ */
   --ion-text-color-rgb: 34, 34, 34;
 
   --ion-tab-bar-background: #e7bb7a;
+  --ion-tab-bar-background-rgb: 231, 187, 122;
   --ion-tab-bar-color-selected: #6c4407;
   --ion-tab-bar-color: #2d291f;
 
@@ -110,4 +111,8 @@ http://ionicframework.com/docs/theming/ */
   --ion-color-contrast-rgb: var(--ion-color-tertiary-contrast-rgb);
   --ion-color-shade: var(--ion-color-tertiary-shade);
   --ion-color-tint: var(--ion-color-tertiary-tint);
+}
+
+a {
+  color: black;
 }

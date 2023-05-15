@@ -1,6 +1,10 @@
 <template>
 	<ion-card color="light" @click="router.push(`/school/${school.id}`)">
+		<ion-text class="ion-padding" v-if="school.images === null"
+			><i>No hi ha imatges disponibles.</i></ion-text
+		>
 		<img
+			v-else
 			style="
 				height: 200px;
 				width: 100%;
@@ -9,20 +13,13 @@
 				object-fit: cover;
 			"
 			:alt="school.name"
-			:src="school.images[0]"
+			:src="school.images[0].src"
 		/>
 		<ion-card-header>
 			<ion-card-title>{{ school.name }}</ion-card-title>
 			<ion-card-subtitle>
 				{{ convert(school.type, 'type') + '.' }}
-				{{
-					school.phase
-						.map((item) => convert(item, 'phase'))
-						.join(' i ')
-						.split('')
-						.map((item, index) => (index === 0 ? item.toUpperCase() : item))
-						.join('')
-				}}</ion-card-subtitle
+				{{ convert(school.phase, 'phase') }}</ion-card-subtitle
 			>
 		</ion-card-header>
 

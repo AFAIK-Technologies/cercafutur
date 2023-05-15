@@ -33,7 +33,7 @@
 				style="margin-top: 1rem"
 			>
 				<ion-segment-button value="signup">
-					<ion-label>Crear compte</ion-label>
+					<ion-label>Crear un compte</ion-label>
 				</ion-segment-button>
 				<ion-segment-button value="signin">
 					<ion-label>Iniciar sessió</ion-label>
@@ -119,11 +119,9 @@
 				</ion-item>
 			</ion-list>
 			<ion-button @click="submit">{{
-				section === 'signup' ? 'Crea un compte' : 'Iniciar sessió'
+				section === 'signup' ? 'Crear un compte' : 'Iniciar sessió'
 			}}</ion-button>
 		</div>
-
-		<span>{{ user }}</span>
 	</TabLayout>
 </template>
 
@@ -136,6 +134,7 @@ import {
 	IonSegmentButton,
 	IonButton,
 	alertController,
+	actionSheetController,
 } from '@ionic/vue';
 
 import TabLayout from '@/layout/tabLayout.vue';
@@ -303,6 +302,43 @@ async function signOut(e: CustomEvent) {
 
 	await alert.present();
 }
+/*
+const result = ref('');
+
+const presentActionSheet = async () => {
+	const actionSheet = await actionSheetController.create({
+		header: 'Administració del compte',
+		subHeader: 'Escull una acció',
+		buttons: [
+			{
+				text: 'Eliminar compte',
+				role: 'destructive',
+				data: {
+					action: 'deleteAccount',
+				},
+			},
+			{
+				text: 'Tancar la sessió',
+				data: {
+					action: 'signOut',
+				},
+			},
+			{
+				text: 'Cancel·lar',
+				role: 'cancel',
+				data: {
+					action: 'cancel',
+				},
+			},
+		],
+	});
+
+	await actionSheet.present();
+
+	const res = await actionSheet.onDidDismiss();
+};
+
+ */
 </script>
 
 <style>

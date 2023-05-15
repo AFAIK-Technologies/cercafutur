@@ -1,5 +1,7 @@
 import { doc, getDoc } from 'firebase/firestore';
 import { useFirestore } from 'vuefire';
+import * as cluster from 'cluster';
+import { phoneLandscape } from 'ionicons/icons';
 
 const db = useFirestore();
 
@@ -35,7 +37,13 @@ export interface School {
 			optional: string[];
 		};
 	};
-	images: string[];
+	images:
+		| {
+				src: string;
+				credits: string;
+				link?: string;
+		  }[]
+		| null;
 	rates?: {
 		count: number;
 		total: number;
@@ -56,6 +64,7 @@ export const schoolData: Array<School> = [
 			contact: {
 				phone: '934260676',
 				email: 'a8043462@xtec.cat',
+				website: 'insernestlluch.cat',
 			},
 			founded: 1989,
 			langs: {
@@ -65,7 +74,10 @@ export const schoolData: Array<School> = [
 			},
 		},
 		images: [
-			'https://pr1.nicelocal.es/e0ifPlbN368KAUL7Abg_7Q/587x440,q85/4px-BW84_n0QJGVPszge3NRBsKw-2VcOifrJIjPYFYkOtaCZxxXQ2Sa80O38iLLXbZS4wbfY9tlQuR_SiWcYW7ty4OHlqxn5FHRvkoPNFU3ihhVb0QPURw',
+			{
+				src: 'https://insernestlluch.cat/wp-content/uploads/2016/08/ernest-1.jpg',
+				credits: 'insernestlluch.cat',
+			},
 		],
 	},
 	{
@@ -87,13 +99,7 @@ export const schoolData: Array<School> = [
 				optional: ['de'],
 			},
 		},
-		images: [
-			'https://www.garciafaura.com/wp-content/uploads/2019/02/277-01.jpg',
-			'https://www.garciafaura.com/wp-content/uploads/2019/02/277-02.jpg',
-			'https://www.garciafaura.com/wp-content/uploads/2019/02/277-05.jpg',
-			'https://www.garciafaura.com/wp-content/uploads/2019/02/277-09.jpg',
-			'https://www.garciafaura.com/wp-content/uploads/2019/02/277-11.jpg',
-		],
+		images: null,
 	},
 	{
 		id: 3,
@@ -108,46 +114,112 @@ export const schoolData: Array<School> = [
 			},
 			founded: 2001,
 		},
-		images: [
-			'https://estatics-nasia.dtibcn.cat/nasia-pro/media/1081092719-escoles%202011_2012_150_P%C3%A1gina_052_Imagen_0003.jpg',
-			'https://static1.ara.cat/clip/7fdecaca-f055-4882-8b89-1252d5c3a728_facebook-aspect-ratio_default_0.jpg',
-		],
+		images: null,
 	},
 	{
 		id: 4,
-		name: 'Escola Jesuïtes del Clot',
+		name: 'Escola Jesuïtes el Clot',
 		type: 'public-funded',
 		phase: ['primary', 'secondary'],
 		properties: {
-			location: [41.41281544710386, 2.1904944769525185],
+			location: [41.4128, 2.1904],
 			address: 'C/València 680, 08027 Barcelona',
 			contact: {
 				phone: '933525052',
-				website: 'https://www.fje.edu/ca/jesuites-clot',
+				website: 'www.fje.edu/ca/jesuites-clot',
 			},
 			founded: 1900,
 		},
+		images: null,
+	},
+	{
+		id: 5,
+		name: 'Institut Poeta Maragall',
+		type: 'public',
+		phase: ['secondary'],
+		properties: {
+			location: [41.3913, 2.1567],
+			address: 'C/Provença 187, 08036 Barcelona',
+			contact: {
+				phone: '934534782',
+				website: 'agora.xtec.cat/iesmaragall/',
+			},
+			founded: 1929,
+		},
+		images: null,
+	},
+	{
+		id: 6,
+		name: 'Institut Milà i Fontanals',
+		type: 'public',
+		phase: ['secondary'],
+		properties: {
+			location: [41.3761, 2.1668],
+			address: 'Plaça de Josep M. Folch i Torres, 08001 Barcelona',
+			contact: {
+				phone: '934417958',
+				website: 'agora.xtec.cat/ins-mila-bcn/',
+			},
+			founded: 1933,
+		},
 		images: [
-			'https://www.formacioprofessional.com/sites/default/files/styles/capsalera/public/content/nodes/centre/image/4/clotl.jpg',
-			'https://upload.wikimedia.org/wikipedia/commons/d/de/Escola_del_Clot.jpg',
-			'https://www.fje.edu/sites/default/files/styles/large/public/2022-10/clot-eso-installacions-pati_0.jpg.webp?itok=vZYC7ddX',
+			{
+				src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Institut_Mil%C3%A0_i_Fontanals.jpg/800px-Institut_Mil%C3%A0_i_Fontanals.jpg?20221127100931',
+				credits: 'Quelet, Institut Milà i Fontanals, CC BY-SA 3.0',
+				link: 'commons.wikimedia.org/wiki/File:Institut_Milà_i_Fontanals.jpg',
+			},
 		],
+	},
+	{
+		id: 7,
+		name: 'Escola Diputació',
+		type: 'public',
+		phase: ['primary'],
+		properties: {
+			location: [41.3817, 2.1556],
+			address: 'C/Diputació 112-116, 08015 Barcelona',
+			contact: {
+				phone: '934546868',
+				website: 'agora.xtec.cat/ceip-diputacio/',
+			},
+			founded: 1995,
+		},
+		images: null,
+	},
+	{
+		id: 8,
+		name: 'Escola Joan Miró',
+		type: 'public',
+		phase: ['primary'],
+		properties: {
+			location: [41.3785, 2.151],
+			address: 'C/Diputació 21, 08015 Barcelona',
+			contact: {
+				phone: '933254249',
+				website: 'www.escolajoanmiro.cat/',
+			},
+			founded: 1986,
+		},
+		images: null,
 	},
 ];
 
-export function convert(str: Phase | SchoolType, type: 'phase' | 'type') {
+export function convert(str: Phase[] | SchoolType, type: 'phase' | 'type') {
 	if (type === 'phase') {
 		// @ts-ignore
-		return {
-			secondary: 'secundària',
-			primary: 'primària',
-		}[str];
+		if (str.length === 2) {
+			return 'Primària i secundària';
+		} else if (str[0] === 'secondary') {
+			return 'Secundària';
+		} else {
+			return 'Primària';
+		}
 	} else {
-		// @ts-ignore
 		return {
 			public: 'Públic',
 			'public-funded': 'Concertat',
 			private: 'Privat',
+			// @ts-ignore
 		}[str];
 	}
 }

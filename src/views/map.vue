@@ -25,15 +25,23 @@
 					<l-tooltip>{{ school.name }}</l-tooltip>
 				</l-marker>
 			</l-map>
-			<ion-toggle
-				style="margin-top: 8px"
-				color="medium"
-				v-model="filtersToggle"
-				ref="filtersToggleEl"
-				>Filtres</ion-toggle
-			>
-			<Filters :enabled="filtersToggle" />
 		</div>
+		<ion-toggle
+			style="margin-top: 8px"
+			color="medium"
+			v-model="filtersToggle"
+			ref="filtersToggleEl"
+			:disabled="true"
+			>Filtres</ion-toggle
+		>
+		<Filters
+			@filterChange="
+				(data) => {
+					filterData = data;
+				}
+			"
+			:enabled="filtersToggle"
+		/>
 	</TabLayout>
 </template>
 
@@ -44,7 +52,6 @@ import {
 	LMarker,
 	LControlLayers,
 	LTooltip,
-
 } from '@vue-leaflet/vue-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { schoolData } from '@/data';
@@ -55,6 +62,7 @@ import { computed, reactive, ref } from 'vue';
 import Filters from '@/components/filters.vue';
 
 const filtersToggle = ref(false);
+const filterData = ref({});
 
 const coords = [41.378360799800085, 2.150300284782486];
 

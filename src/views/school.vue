@@ -24,10 +24,39 @@
 						align-items: center;
 					"
 				>
-					<h2 style="margin: 0">{{ school.name }}</h2>
-					<ion-text color="medium">{{ convert(school.type, 'type') }}</ion-text>
+					<h2 style="margin: 0">{{ school?.name }}</h2>
+					<ion-text color="primary"
+						><b>{{ convert(school?.type, 'type') }}</b></ion-text
+					>
 				</header>
-				<img :alt="school.name" :src="school.images[0]" />
+				<div
+					style="
+						width: 100%;
+						height: 100px;
+						display: flex;
+						place-content: center;
+						align-items: center;
+						flex-direction: column;
+					"
+					v-if="school?.images === null"
+				>
+					<span>No hi ha imatges disponibles.</span>
+					<ion-button @click="openBrowser('Google Images', school?.name)"
+						>Cerca'n a Google</ion-button
+					>
+				</div>
+				<template v-else>
+					<img :alt="school?.name" :src="school?.images?.[imageIndex].src" />
+					<span class="ion-text-sm-left"
+						>Font de la imatge: {{ school?.images?.[imageIndex].credits }}
+						<a
+							v-if="school?.images?.[imageIndex]?.link"
+							@click="openBrowser(school?.images?.[imageIndex]?.link)"
+							>Enllaç</a
+						></span
+					>
+				</template>
+
 				<div
 					style="
 						display: flex;
@@ -39,9 +68,13 @@
 				>
 					<h4 style="display: contents">Puntuació</h4>
 					<div style="display: flex; flex-direction: row; align-items: center">
-						<ion-text color="primary" style="margin-right: 4px">{{
-							score
-						}}</ion-text>
+						<ion-text color="primary" style="margin-right: 4px"
+							><b>{{
+								school?.rates?.count
+									? (school?.rates?.total / school?.rates?.count).toFixed(2)
+									: '?'
+							}}</b></ion-text
+						>
 						<ion-icon
 							v-for="i in 5"
 							:icon="
@@ -53,21 +86,104 @@
 						>
 					</div>
 				</div>
-				<ion-card v-for="review in reviews">
+				<h3>Ressenyes</h3>
+				<ion-text v-if="reviews.length === 0"
+					><i>No hi ha ressenyes d'aquest centre.</i><br
+				/></ion-text>
+				<ion-card v-else v-for="review in reviews" color="light">
 					<ion-card-header>
 						<ion-title style="padding-left: 0">{{
-							review.stars +
-							' estrell' +
-							(review.stars === (1).toString() ? 'a' : 'es')
+							review?.stars + ' estrell' + (review?.stars === '1' ? 'a' : 'es')
 						}}</ion-title>
 						<ion-card-subtitle
-							>Ressenya de {{ review.author.name }}</ion-card-subtitle
+							>Ressenya de {{ review?.author?.name }}</ion-card-subtitle
 						>
 					</ion-card-header>
 					<ion-card-content>
 						{{ '"' + review.text + '"' }}
 					</ion-card-content>
 				</ion-card>
+				<ion-button @click="rateRedirect">Valora aquest centre</ion-button>
+				<h3>Informació</h3>
+				<ion-list style="padding-top: 0" v-if="school">
+					<ion-item
+						>Tipus de centre:
+						<b style="margin-left: 0.25rem">{{
+							convert(school?.type, 'type')
+						}}</b></ion-item
+					>
+					<ion-item
+						>Fase escolar:
+						<b style="margin-left: 0.25rem">{{
+							convert(school?.phase, 'phase')
+						}}</b></ion-item
+					>
+					<ion-item
+						>Any de fundació:
+						<b style="margin-left: 0.25rem">{{
+							school?.properties.founded
+						}}</b></ion-item
+					>
+					<ion-item
+						>Adreça:
+						<b
+							@click="
+								writeToClipboard(school?.properties.address);
+								presentToast('Adreça copiada al portaretalls');
+							"
+							style="margin-left: 0.25rem"
+							>{{ school?.properties.address }}</b
+						></ion-item
+					>
+				</ion-list>
+				<h3>Contacte</h3>
+				<ion-list v-if="school">
+					<ion-item v-if="school?.properties.contact?.website"
+						><a @click="openBrowser(school?.properties.contact?.website)"
+							><u>Pàgina web ({{ school?.properties.contact?.website }})</u></a
+						></ion-item
+					>
+					<ion-item v-if="school?.properties.contact?.phone">
+						<a
+							@click="
+								writeToClipboard(school?.properties.contact?.phone);
+								presentToast('Telèfon copiat al portaretalls');
+							"
+						>
+							<u>Telèfon ({{ school?.properties.contact?.phone }})</u></a
+						>
+					</ion-item>
+					<ion-item v-if="school?.properties.contact?.email">
+						<a
+							@click="
+								writeToClipboard(school?.properties.contact?.email);
+								presentToast('Correu electrònic copiat al portaretalls');
+							"
+						>
+							<u
+								>Correu electrònic ({{ school?.properties.contact?.email }})</u
+							></a
+						>
+					</ion-item>
+				</ion-list>
+				<h3>Localització</h3>
+				<div style="height: 200px; width: 100%">
+					<l-map
+						v-if="school"
+						:use-global-leaflet="false"
+						zoom="15"
+						world-copy-jump
+						:dragging="false"
+						:options="{ boxZoom: false, attributionControl: false }"
+						:center="school?.properties.location"
+					>
+						<l-tile-layer
+							url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+						></l-tile-layer>
+						<l-control-layers />
+						<l-marker :lat-lng="[...school?.properties.location]"> </l-marker>
+					</l-map>
+				</div>
 			</div>
 		</ion-content>
 	</ion-page>
@@ -84,9 +200,26 @@ import {
 	IonButtons,
 	IonText,
 	IonIcon,
+	IonList,
+	IonItem,
+	toastController,
+	IonProgressBar,
+	IonCard,
+	IonCardContent,
+	IonCardTitle,
+	IonCardHeader,
+	IonCardSubtitle,
+	useIonRouter,
 } from '@ionic/vue';
+import {
+	LMap,
+	LTileLayer,
+	LMarker,
+	LControlLayers,
+} from '@vue-leaflet/vue-leaflet';
+import 'leaflet/dist/leaflet.css';
 import { star, starOutline, starHalf } from 'ionicons/icons';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { Review, schoolData, convert } from '@/data';
 import { computed, Ref, ref } from 'vue';
 import {
@@ -97,21 +230,30 @@ import {
 	doc,
 	getDoc,
 } from 'firebase/firestore';
-import { useFirestore } from 'vuefire';
+import { useCurrentUser, useFirestore } from 'vuefire';
+import { Browser } from '@capacitor/browser';
+import { Clipboard } from '@capacitor/clipboard';
 
 const route = useRoute();
+const ionRouter = useIonRouter();
 const loading = ref(true);
 
 console.log(parseInt(route.params.id[0]));
 
 const school = computed(() => {
+	if (typeof route?.params?.id?.[0] === 'undefined') return null;
+	loading.value = false;
 	updateReviews();
-	return schoolData.find((item) => item.id === parseInt(route.params.id[0]));
+	return schoolData.find(
+		(item) => item.id === parseInt(route.params.id[0] ?? 1)
+	);
 });
 
 const reviews: Ref<Review[]> = ref([]);
 
 const score: Ref<number | null> = ref(null);
+
+const imageIndex = ref(0);
 
 async function updateReviews() {
 	if (typeof school?.value?.rates === 'undefined') {
@@ -121,6 +263,7 @@ async function updateReviews() {
 		//@ts-ignore
 		school.value.rates = docSnap.data();
 	}
+	console.log(school.value?.rates);
 	const q = query(
 		collection(useFirestore(), `reviews/${route.params.id[0]}/list`),
 		where(
@@ -147,6 +290,45 @@ async function updateReviews() {
 				(school?.value?.rates?.total / school?.value?.rates?.count) * 2
 		  ) / 2
 		: null;
+}
+
+const openBrowser = async (
+	link: string | 'Google Images',
+	query?: string | undefined
+) => {
+	await Browser.open({
+		url:
+			'https://' +
+			(link === 'Google Images'
+				? 'www.google.com/search?tbm=isch&q=' + encodeURI(query as string)
+				: link),
+	});
+};
+
+const writeToClipboard = async (text: string) => {
+	await Clipboard.write({
+		string: text,
+	});
+};
+
+async function presentToast(text: string) {
+	const toast = await toastController.create({
+		message: text,
+		duration: 1500,
+		position: 'bottom',
+	});
+
+	await toast.present();
+}
+
+console.log();
+function rateRedirect(e: CustomEvent) {
+	if (useCurrentUser().value) {
+		ionRouter.back;
+		ionRouter.push(`/school/${school.value?.id}/rate`);
+	} else {
+		ionRouter.push('../tabs/profile');
+	}
 }
 </script>
 

@@ -32,29 +32,30 @@ const routes: Array<RouteRecordRaw> = [
 		path: '/school/:id',
 		component: () => import('@/views/school.vue'),
 	},
+	{
+		path: '/school/:id/rate',
+		component: () => import('@/views/rate.vue'),
+	},
 ];
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
 	routes,
 });
-
-router.beforeEach(async (to) => {
+/*
+router.beforeEach((to) => {
 	// routes with `meta: { requiresAuth: true }` will check for the users, others won't
 	if (to.meta.requiresAuth) {
-		const currentUser = await useCurrentUser();
+		const currentUser = useCurrentUser();
 		// if the user is not logged in, redirect to the login page
 		if (!currentUser) {
 			return {
 				path: '/profile',
-				query: {
-					// we keep the current path in the query so we can redirect to it after log in
-					// with `router.push(route.query.redirect || '/')`
-					redirect: to.fullPath,
-				},
 			};
 		}
 	}
 });
+
+ */
 
 export default router;

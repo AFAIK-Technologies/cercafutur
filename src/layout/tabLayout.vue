@@ -10,7 +10,7 @@
 			</ion-toolbar>
 		</ion-header>
 		<ion-content :fullscreen="true">
-			<div style="padding: 1rem 1rem">
+			<div style="padding: 1rem 1rem calc(1rem + 56px) 1rem">
 				<slot />
 			</div>
 		</ion-content>
