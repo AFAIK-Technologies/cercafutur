@@ -202,6 +202,38 @@ export const schoolData: Array<School> = [
 		},
 		images: null,
 	},
+	{
+		id: 9,
+		name: 'Escola Auró',
+		type: 'public',
+		phase: ['primary'],
+		properties: {
+			location: [41.386, 2.1523],
+			address: 'C/Mallorca 106, 08029 Barcelona',
+			contact: {
+				phone: '934530741',
+				website: 'agora.xtec.cat/ceipauro/',
+			},
+			founded: 1994,
+		},
+		images: null,
+	},
+	{
+		id: 10,
+		name: 'Institut Montserrat',
+		type: 'public',
+		phase: ['secondary'],
+		properties: {
+			location: [41.4019, 2.1435],
+			address: 'C/Copèrnic 84, 08006 Barcelona',
+			contact: {
+				phone: '932004913',
+				website: 'www.institutmontserrat.cat',
+			},
+			founded: 1941,
+		},
+		images: null,
+	},
 ];
 
 export function convert(str: Phase[] | SchoolType, type: 'phase' | 'type') {

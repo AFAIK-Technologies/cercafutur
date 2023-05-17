@@ -130,13 +130,10 @@ function fetch() {
 				)
 			);
 			const snapshot = await getDocs(q);
-			console.log(snapshot.docs);
 			snapshot.docs.forEach((item) => {
-				console.log(item);
 				const index = recommended.value?.findIndex(
 					(o) => o.id === parseInt(item.id)
 				);
-				console.log(index);
 				if (index !== -1) {
 					recommended.value[index].rates = item.data();
 				}
