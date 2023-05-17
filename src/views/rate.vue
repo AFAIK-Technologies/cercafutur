@@ -81,7 +81,6 @@ const text = ref('');
 const user = useCurrentUser();
 
 async function submit() {
-	// Obtenir
 	const snap = await getDoc(
 		doc(useFirestore(), 'reviews', route.params.id[0].toString())
 	);
