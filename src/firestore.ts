@@ -2,7 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
 export const firebaseApp = initializeApp({
-	apiKey: 'AIzaSyAK8yweRdBq3IlTKrPzB6wTRVcWFD_N2P8',
+	apiKey: 'null',
 	authDomain: 'cerca-futur-afaik.firebaseapp.com',
 	projectId: 'cerca-futur-afaik',
 	storageBucket: 'cerca-futur-afaik.appspot.com',
