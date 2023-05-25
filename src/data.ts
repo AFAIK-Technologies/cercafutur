@@ -202,6 +202,23 @@ export const schoolData: Array<School> = [
 		},
 		images: null,
 	},
+	{
+		id: 9,
+		name: 'Escola Auró',
+		type: 'public',
+		phase: ['primary'],
+		properties: {
+			location: [41.3860, 2.1523],
+			address: 'C/Mallorca 106, 08029 Barcelona',
+			contact: {
+					phone: '934530741',
+					website: 'https://agora.xtec.cat/ceipauro/',
+				},
+				founded: 1994
+			
+		},
+		images: null
+	}
 ];
 
 export function convert(str: Phase[] | SchoolType, type: 'phase' | 'type') {
