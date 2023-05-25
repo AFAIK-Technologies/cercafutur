@@ -6,6 +6,9 @@ d'usuari. Creat amb Vue i Ionic Framework.
 - Git
 - Node.js
 - Android Studio
+
+També hauràs de reemplaçar el contingut de [firestore.ts](src/firestore.ts) amb el codi que Firebase et proporciona, indicant la clau de l'API.
+
 # Instal·lació
 1. Clonar repositori.
 ```shell
