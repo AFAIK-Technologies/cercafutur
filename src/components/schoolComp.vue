@@ -1,10 +1,7 @@
 <template>
 	<ion-card color="light" @click="router.push(`/school/${school.id}`)">
-		<ion-text class="ion-padding" v-if="school.images === null"
-			><i>No hi ha imatges disponibles.</i></ion-text
-		>
 		<img
-			v-else
+			v-if="school.images"
 			style="
 				height: 200px;
 				width: 100%;
