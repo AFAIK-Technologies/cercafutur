@@ -122,6 +122,10 @@
 				section === 'signup' ? 'Crear un compte' : 'Iniciar sessió'
 			}}</ion-button>
 		</div>
+		<p>
+			CercaFutur utilitza Firebase Auth per l'autenticació. Totes les dades
+			estan encriptades.
+		</p>
 	</TabLayout>
 </template>
 
