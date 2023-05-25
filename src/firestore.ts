@@ -1,13 +1,8 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import * as FirestoreData from './firestore.json';
 
-export const firebaseApp = initializeApp({
-	apiKey: 'null',
-	authDomain: 'cerca-futur-afaik.firebaseapp.com',
-	projectId: 'cerca-futur-afaik',
-	storageBucket: 'cerca-futur-afaik.appspot.com',
-	messagingSenderId: '525279481418',
-	appId: '1:525279481418:web:66a54453991f45016b60b3',
-});
+console.log(FirestoreData);
+export const firebaseApp = initializeApp(FirestoreData);
 
 export const db = getFirestore(firebaseApp);
