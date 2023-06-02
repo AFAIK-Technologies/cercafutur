@@ -5,7 +5,6 @@
 				v-model="zoom"
 				v-model:zoom="zoom"
 				:center="coords"
-				@move="log('move')"
 				:use-global-leaflet="false"
 				max-zoom="17"
 				min-zoom="10"
@@ -20,7 +19,6 @@
 				<l-marker
 					v-for="school in schoolData"
 					:lat-lng="[...school.properties.location]"
-					@moveend="log('moveend')"
 				>
 					<l-tooltip>{{ school.name }}</l-tooltip>
 				</l-marker>
@@ -67,7 +65,4 @@ const filterData = ref({});
 const coords = [41.378360799800085, 2.150300284782486];
 
 const zoom = ref(14);
-function log(a: string) {
-	console.log(a);
-}
 </script>

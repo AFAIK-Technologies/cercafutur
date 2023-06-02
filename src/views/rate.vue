@@ -93,7 +93,6 @@ async function submit() {
 			}
 		);
 	} else {
-		console.log(snap.data());
 		await updateDoc(
 			doc(useFirestore(), 'reviews', route.params.id[0].toString()),
 			{
@@ -110,7 +109,6 @@ async function submit() {
 	);
 
 	const existSnap = await getDoc(docRef);
-	console.log(existSnap.exists());
 	if (existSnap.exists()) {
 		await updateDoc(docRef, {
 			author: {
