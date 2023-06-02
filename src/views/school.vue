@@ -238,15 +238,11 @@ const route = useRoute();
 const ionRouter = useIonRouter();
 const loading = ref(true);
 
-console.log(parseInt(route.params.id[0]));
-
 const school = computed(() => {
-	if (typeof route?.params?.id?.[0] === 'undefined') return null;
+	if (typeof route?.params?.id === 'undefined') return null;
 	loading.value = false;
 	updateReviews();
-	return schoolData.find(
-		(item) => item.id === parseInt(route.params.id[0] ?? 1)
-	);
+	return schoolData.find((item) => item.id === parseInt(route.params.id ?? 1));
 });
 
 const reviews: Ref<Review[]> = ref([]);
@@ -258,14 +254,13 @@ const imageIndex = ref(0);
 async function updateReviews() {
 	if (typeof school?.value?.rates === 'undefined') {
 		const docSnap = await getDoc(
-			doc(useFirestore(), 'reviews', route.params.id[0].toString())
+			doc(useFirestore(), 'reviews', route.params.id.toString())
 		);
 		//@ts-ignore
 		school.value.rates = docSnap.data();
 	}
-	console.log(school.value?.rates);
 	const q = query(
-		collection(useFirestore(), `reviews/${route.params.id[0]}/list`),
+		collection(useFirestore(), `reviews/${route.params.id}/list`),
 		where(
 			'text',
 			'!=',
@@ -321,7 +316,6 @@ async function presentToast(text: string) {
 	await toast.present();
 }
 
-console.log();
 function rateRedirect(e: CustomEvent) {
 	if (useCurrentUser().value) {
 		ionRouter.back;
