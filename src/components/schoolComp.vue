@@ -40,7 +40,9 @@
 						<ion-text style="">
 							{{
 								school.rates
-									? school.rates?.total / school.rates?.count + ' / 5'
+									? (school?.rates?.count
+											? (school?.rates?.total / school?.rates?.count).toFixed(2)
+											: '?') + ' / 5'
 									: 'Sense ressenyes'
 							}}
 						</ion-text>
