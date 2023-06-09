@@ -15,7 +15,7 @@
 				:pin="true"
 				:step="filter.values.steps"
 				:disabled="!enabled"
-				@ionChange="filterData[filter.id] = $event.target.value"
+				v-model="filterData[filter.id]"
 				:pin-formatter="filter.values.format"
 			>
 				<div slot="label">{{ filter.title }}</div>
@@ -26,7 +26,7 @@
 				:multiple="filter.type === 'multiple'"
 				placeholder="Selecciona..."
 				:label="filter.title"
-				@ionChange="filterData[filter.id] = $event.target.value"
+				v-model="filterData[filter.id]"
 			>
 				<ion-select-option v-for="option in filter.values" :value="option.id">{{
 					option.show
@@ -44,27 +44,24 @@ import {
 	IonList,
 	IonItem,
 } from '@ionic/vue';
-import { reactive, watch, watchEffect } from 'vue';
+import { reactive, Ref, ref, watch, watchEffect } from 'vue';
+import { SchoolFilters } from '@/stores/schools';
 
-const emit = defineEmits(['filterChange']);
+const emit = defineEmits(['update:modelValue']);
 
 const props = withDefaults(
-	defineProps<{ enabled?: boolean; noSliders?: boolean }>(),
+	defineProps<{ enabled?: boolean; noSliders?: boolean; modelValue: any }>(),
 	{
 		enabled: true,
 		noSliders: false,
 	}
 );
 
-const filterData: Object = reactive({
-	phase: null,
-	type: null,
-	distance: null,
-	score: null,
-});
+const filterData: Ref<SchoolFilters> = ref(props.modelValue);
 
-watch(filterData, () => {
-	emit('filterChange', filterData);
+watch([filterData], () => {
+	emit('update:modelValue', filterData.value);
+	console.log(filterData.value);
 });
 
 const filters: {
@@ -82,7 +79,7 @@ const filters: {
 		  };
 }[] = [
 	{
-		type: 'single',
+		type: 'multiple',
 		title: 'Etapa educativa',
 		id: 'phase',
 		values: [
@@ -95,8 +92,8 @@ const filters: {
 				id: 'secondary',
 			},
 			{
-				show: 'Institut-escola',
-				id: 'both',
+				show: 'Batxillerat',
+				id: 'postsecondary',
 			},
 		],
 	},

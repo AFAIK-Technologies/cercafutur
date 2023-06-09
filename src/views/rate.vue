@@ -62,7 +62,7 @@ import {
 import { useRoute, useRouter } from 'vue-router';
 import { schoolData } from '@/data';
 import { doc, setDoc, getDoc, updateDoc, increment } from 'firebase/firestore';
-import { useCurrentUser, useFirestore } from 'vuefire';
+import { getCurrentUser, useCurrentUser, useFirestore } from 'vuefire';
 
 const loading = ref(true);
 onMounted(() => {
@@ -81,6 +81,7 @@ const text = ref('');
 const user = useCurrentUser();
 
 async function submit() {
+	// Ressenya
 	const snap = await getDoc(
 		doc(useFirestore(), 'reviews', route.params.id[0].toString())
 	);
@@ -102,7 +103,7 @@ async function submit() {
 		);
 	}
 
-	const docRef = doc(
+	let docRef = doc(
 		useFirestore(),
 		'reviews/' + route.params.id[0] + '/list/',
 		snap?.data()?.count ? (snap?.data()?.count + 1).toString() : '1'
