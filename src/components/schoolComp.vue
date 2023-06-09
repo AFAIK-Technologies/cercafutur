@@ -1,7 +1,7 @@
 <template>
-	<ion-card color="light" @click="router.push(`/school/${school.id}`)">
+	<ion-card color="light" @click="router.push(`/school/${props.school.id}`)">
 		<img
-			v-if="school.images"
+			v-if="props.school.images"
 			style="
 				height: 200px;
 				width: 100%;
@@ -9,22 +9,26 @@
 				object-position: center;
 				object-fit: cover;
 			"
-			:alt="school.name"
-			:src="school.images[0].src"
+			:alt="props.school.name"
+			:src="props.school.images[0].src"
 		/>
 		<ion-card-header>
-			<ion-card-title>{{ school.name }}</ion-card-title>
+			<ion-card-title>{{ props.school.name }}</ion-card-title>
 			<ion-card-subtitle>
-				{{ convert(school.type, 'type') + '.' }}
-				{{ convert(school.phase, 'phase') }}</ion-card-subtitle
+				{{ convert(props.school.type, 'type') + '.' }}
+				{{ schools.convertSchoolPhases(props.school.phase) }}</ion-card-subtitle
 			>
 		</ion-card-header>
 
 		<ion-card-content>
 			<ion-grid style="padding: 0">
 				<ion-row>
-					<ion-col style="padding: 0">
-						{{ `A ${Math.round(school.distance * 10) * 100} m de tu` }}
+					<ion-col v-if="props.school?.distance" style="padding: 0">
+						{{
+							`A ${Math.round(props.school.distance * 10) * 100} m de ${
+								geo.customGeo ? "l'ubicació establerta" : 'tu'
+							}`
+						}}
 					</ion-col>
 					<ion-col
 						class=""
@@ -39,9 +43,12 @@
 					>
 						<ion-text style="">
 							{{
-								school.rates
-									? (school?.rates?.count
-											? (school?.rates?.total / school?.rates?.count).toFixed(2)
+								props.school.rates
+									? (props.school?.rates?.count
+											? (
+													props.school?.rates?.total /
+													props.school?.rates?.count
+											  ).toFixed(2)
 											: '?') + ' / 5'
 									: 'Sense ressenyes'
 							}}
@@ -53,7 +60,11 @@
 								starIcons[
 									Math.floor(
 										Math.round(
-											(school.rates?.total / school.rates?.count / 5) * 3 * 100
+											(props.school.rates?.total /
+												props.school.rates?.count /
+												5) *
+												3 *
+												100
 										) / 100
 									) ?? 0
 								]
@@ -80,15 +91,19 @@ import {
 	IonCardContent,
 } from '@ionic/vue';
 import { star, starHalf, starOutline } from 'ionicons/icons';
-import { School, convert } from '@/data';
+import { School, convert, SchoolFull } from '@/data';
 import { useRouter } from 'vue-router';
+import { useSchoolsStore } from '@/stores/schools';
+import { useGeoStore } from '@/stores/geo';
 
 const props = defineProps<{
-	school: School;
-	geo: number[];
+	school: SchoolFull;
 }>();
 
+const schools = useSchoolsStore();
+
 const router = useRouter();
+const geo = useGeoStore();
 
 const starIcons = [starOutline, starHalf, star];
 </script>

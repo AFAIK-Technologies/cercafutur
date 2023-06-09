@@ -42,16 +42,20 @@
 				>
 					<span>No hi ha imatges disponibles.</span>
 					<ion-button @click="openBrowser('Google Images', school?.name)"
-						>Cerca'n a Google</ion-button
-					>
+						>Cerca'n a Google
+					</ion-button>
 				</div>
 				<template v-else>
-					<img :alt="school?.name" :src="school?.images?.[imageIndex].src" />
+					<img
+						:alt="school?.name"
+						:src="school?.images?.[imageIndex].src"
+					/><br />
 					<span class="ion-text-sm-left"
 						>Font de la imatge: {{ school?.images?.[imageIndex].credits }}
 						<a
 							v-if="school?.images?.[imageIndex]?.link"
 							@click="openBrowser(school?.images?.[imageIndex]?.link)"
+							style="text-decoration: underline"
 							>Enllaç</a
 						></span
 					>
@@ -82,8 +86,8 @@
 							"
 							size="large"
 							color="primary"
-							>{{ i }}</ion-icon
-						>
+							>{{ i }}
+						</ion-icon>
 					</div>
 				</div>
 				<h3>Ressenyes</h3>
@@ -92,12 +96,16 @@
 				/></ion-text>
 				<ion-card v-else v-for="review in reviews" color="light">
 					<ion-card-header>
-						<ion-title style="padding-left: 0">{{
-							review?.stars + ' estrell' + (review?.stars === '1' ? 'a' : 'es')
-						}}</ion-title>
+						<ion-title style="padding-left: 0"
+							>{{
+								review?.stars +
+								' estrell' +
+								(review?.stars === '1' ? 'a' : 'es')
+							}}
+						</ion-title>
 						<ion-card-subtitle
-							>Ressenya de {{ review?.author?.name }}</ion-card-subtitle
-						>
+							>Ressenya de {{ review?.author?.name }}
+						</ion-card-subtitle>
 					</ion-card-header>
 					<ion-card-content>
 						{{ '"' + review.text + '"' }}
@@ -140,7 +148,7 @@
 				<ion-list v-if="school">
 					<ion-item v-if="school?.properties.contact?.website"
 						><a @click="openBrowser(school?.properties.contact?.website)"
-							><u>Pàgina web ({{ school?.properties.contact?.website }})</u></a
+							>Pàgina web: <u>{{ school?.properties.contact?.website }}</u></a
 						></ion-item
 					>
 					<ion-item v-if="school?.properties.contact?.phone">
@@ -150,7 +158,7 @@
 								presentToast('Telèfon copiat al portaretalls');
 							"
 						>
-							<u>Telèfon ({{ school?.properties.contact?.phone }})</u></a
+							Telèfon: <u>{{ school?.properties.contact?.phone }}</u></a
 						>
 					</ion-item>
 					<ion-item v-if="school?.properties.contact?.email">
@@ -160,9 +168,8 @@
 								presentToast('Correu electrònic copiat al portaretalls');
 							"
 						>
-							<u
-								>Correu electrònic ({{ school?.properties.contact?.email }})</u
-							></a
+							Correu electrònic:
+							<u>{{ school?.properties.contact?.email }}</u></a
 						>
 					</ion-item>
 				</ion-list>
@@ -181,7 +188,13 @@
 							url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 						></l-tile-layer>
 						<l-control-layers />
-						<l-marker :lat-lng="[...school?.properties.location]"> </l-marker>
+						<l-marker :lat-lng="[...school?.properties.location]"></l-marker>
+						<l-circle-marker
+							v-if="geo.lastError === null && coords"
+							:color="'#2880CA'"
+							:radius="8"
+							:lat-lng="coords"
+						></l-circle-marker>
 					</l-map>
 				</div>
 			</div>
@@ -216,12 +229,13 @@ import {
 	LTileLayer,
 	LMarker,
 	LControlLayers,
+	LCircleMarker,
 } from '@vue-leaflet/vue-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { star, starOutline, starHalf } from 'ionicons/icons';
-import { useRoute, useRouter } from 'vue-router';
-import { Review, schoolData, convert } from '@/data';
-import { computed, Ref, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { Review, convert, SchoolFull } from '@/data';
+import { Ref, ref, watchEffect, computed } from 'vue';
 import {
 	collection,
 	query,
@@ -233,16 +247,21 @@ import {
 import { useCurrentUser, useFirestore } from 'vuefire';
 import { Browser } from '@capacitor/browser';
 import { Clipboard } from '@capacitor/clipboard';
+import { useGeoStore } from '@/stores/geo';
+import { useSchoolsStore } from '@/stores/schools';
 
 const route = useRoute();
 const ionRouter = useIonRouter();
 const loading = ref(true);
+const schools = useSchoolsStore();
 
 const school = computed(() => {
 	if (typeof route?.params?.id === 'undefined') return null;
 	loading.value = false;
 	updateReviews();
-	return schoolData.find((item) => item.id === parseInt(route.params.id ?? 1));
+	return schools.schoolList.find(
+		(item) => item.id === parseInt(route.params.id ?? 1)
+	);
 });
 
 const reviews: Ref<Review[]> = ref([]);
@@ -251,22 +270,23 @@ const score: Ref<number | null> = ref(null);
 
 const imageIndex = ref(0);
 
+const geo = useGeoStore();
+const coords = ref<null | [number, number]>(null);
+
+geo.updateGeo().then(() => {
+	coords.value = geo.geoAsArray;
+});
+
 async function updateReviews() {
 	if (typeof school?.value?.rates === 'undefined') {
 		const docSnap = await getDoc(
 			doc(useFirestore(), 'reviews', route.params.id.toString())
 		);
-		//@ts-ignore
-		school.value.rates = docSnap.data();
+		school.value.rates = docSnap.data() as { count: number; total: number };
 	}
 	const q = query(
 		collection(useFirestore(), `reviews/${route.params.id}/list`),
-		where(
-			'text',
-			'!=',
-			//@ts-ignore
-			''
-		)
+		where('text', '!=', '')
 	);
 	const snapshot = await getDocs(q);
 

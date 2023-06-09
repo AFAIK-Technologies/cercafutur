@@ -1,40 +1,55 @@
 <template>
 	<TabLayout :loading="loading">
-		<ion-searchbar v-model="query" placeholder="Cerca per nom"></ion-searchbar>
-		<ion-select :label="'Ordena per'" :value="order" @ion-dismiss="handleSortChange">
-			<ion-select-option v-for="option in orderOptions" :value="option.id" :key="option.id">{{
-					option.show
-				}}
+		<ion-searchbar
+			v-model="searchQuery"
+			placeholder="Cerca per nom"
+		></ion-searchbar>
+		<ion-select
+			:label="'Ordena per'"
+			:value="order"
+			@ion-dismiss="handleSortChange"
+		>
+			<ion-select-option
+				v-for="option in orderOptions"
+				:value="option.id"
+				:key="option.id"
+				:disabled="option.id === 'distance' && !geo.data.longitude"
+				>{{ option.show }}
 			</ion-select-option>
 		</ion-select>
-
-		<SchoolComp v-for="school in results" :school="school" :geo="geoData" :key="school.id"/>
+		<div class="schoolgrid">
+			<SchoolComp v-for="school in results" :school="school" :key="school.id" />
+		</div>
 	</TabLayout>
 </template>
 
 <script setup lang="ts">
 import TabLayout from '@/layout/tabLayout.vue';
 
-import {Geolocation} from '@capacitor/geolocation';
-import {School, schoolData} from '@/data';
+import { School, SchoolFull } from '@/data';
 import SchoolComp from '@/components/schoolComp.vue';
-import {IonSearchbar} from '@ionic/vue';
+import { IonSearchbar } from '@ionic/vue';
 
-import { ref, Ref, watch} from 'vue';
-import {distancekm} from '@/utils';
+import { ref, Ref, watch } from 'vue';
+import { useSchoolsStore } from '@/stores/schools';
+import { storeToRefs } from 'pinia';
+import { useGeoStore } from '@/stores/geo';
 
-const geoData: Ref<number[] | null> = ref(null);
-
-const query = ref('');
+const searchQuery = ref('');
 
 const loading = ref(true);
 
-const results: Ref<School[]> = ref([])
+const schools = useSchoolsStore();
+const { searchSchools } = storeToRefs(schools);
+
+const results: Ref<SchoolFull[]> = ref([]);
+
+const geo = useGeoStore();
 
 const orderOptions: {
 	id: string;
 	show: string;
-	function: (a: School, b: School) => any;
+	function: (a: SchoolFull, b: SchoolFull) => any;
 }[] = [
 	{
 		id: 'distance',
@@ -44,54 +59,46 @@ const orderOptions: {
 	{
 		id: 'name',
 		show: 'Nom',
-		function: (a, b) => a.name.replace('Institut ', '').replace('Escola ', '')
+		function: (a, b) =>
+			a.name
+				.replace('Institut ', '')
+				.replace('Escola ', '')
 				.localeCompare(b.name.replace('Institut ', '').replace('Escola ', '')),
 	},
-	/*
 	{
 		id: 'score',
 		show: 'Puntuació',
-		function: (a, b) => (Number.isNaN(a.rates?.total / a.rates?.count) ? 0 a.rates?.total / a.rates?.count) - (Number.isNaN(b.rates?.total / b.rates?.count) ? 0 b.rates?.total / b.rates?.count)
-	}
-
-		 */
+		function: (a, b) =>
+			(Number.isNaN(b.rates?.total / b.rates?.count)
+				? 0
+				: b.rates?.total / b.rates?.count) -
+			(Number.isNaN(a.rates?.total / a.rates?.count)
+				? 0
+				: a.rates?.total / a.rates?.count),
+	},
 ];
 
 const order: Ref<string> = ref(orderOptions[0].id);
 
-watch([geoData, order], () => {
-	const sortFunction = geoData.value ? orderOptions.find((item) => item.id === order.value)?.function : orderOptions.find((item) => item.id === 'name')?.function
-	results.value = schoolData
-			.filter((school) => {
-				return school.name.includes(query.value);
-			})
-			.map((item) => {
-				if (geoData.value)
-					item.distance = distancekm(
-							item.properties.location[0],
-							item.properties.location[1],
-							//@ts-ignore
-							geoData.value[0],
-							//@ts-ignore
-							geoData.value[1],
-							'K'
-					);
+async function update() {
+	loading.value = true;
+	await schools.updateAll();
+	if (!geo.data.longitude && order.value === 'distance') {
+		order.value = 'score';
+	}
+	const sortFunction = orderOptions.find(
+		(item) => item.id === order.value
+	)?.function;
 
-				return item;
-			})
-			.sort(sortFunction);
-})
+	results.value = searchSchools.value(searchQuery.value).sort(sortFunction);
+	loading.value = false;
+}
 
+update();
+
+watch([order], update);
 
 function handleSortChange(event: any) {
 	order.value = event.target.value;
 }
-
-Geolocation.getCurrentPosition().then((value) => {
-	geoData.value = [
-		Math.round(value.coords.latitude * 1e3) / 1e3,
-		Math.round(value.coords.longitude * 1e3) / 1e3,
-	];
-	loading.value = false;
-});
 </script>

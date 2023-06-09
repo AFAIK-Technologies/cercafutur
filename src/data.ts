@@ -1,10 +1,3 @@
-import { doc, getDoc } from 'firebase/firestore';
-import { useFirestore } from 'vuefire';
-import * as cluster from 'cluster';
-import { phoneLandscape } from 'ionicons/icons';
-
-const db = useFirestore();
-
 export interface Review {
 	author: {
 		email?: string;
@@ -14,14 +7,14 @@ export interface Review {
 	text: string;
 }
 
-type SchoolType = 'public' | 'public-funded' | 'private';
-type Phase = 'primary' | 'secondary';
+export type SchoolType = 'public' | 'public-funded' | 'private';
+export type SchoolPhase = 'primary' | 'secondary' | 'postsecondary';
 
 export interface School {
 	id: number;
 	name: string;
 	type: SchoolType;
-	phase: Phase[];
+	phase: SchoolPhase[];
 	properties: {
 		location: [latitude: number, longitude: number];
 		address: string;
@@ -44,12 +37,15 @@ export interface School {
 				link?: string;
 		  }[]
 		| null;
+}
+
+export interface SchoolFull extends School {
 	rates?: {
 		count: number;
 		total: number;
 		list?: Review[];
 	};
-	distance?: number;
+	distance: number;
 }
 
 export const schoolData: Array<School> = [
@@ -57,7 +53,7 @@ export const schoolData: Array<School> = [
 		id: 1,
 		name: 'Institut Ernest Lluch',
 		type: 'public',
-		phase: ['secondary'],
+		phase: ['secondary', 'postsecondary'],
 		properties: {
 			location: [41.3783, 2.1503],
 			address: 'C/Diputació 11-15, 08015 Barcelona',
@@ -77,6 +73,7 @@ export const schoolData: Array<School> = [
 			{
 				src: 'https://insernestlluch.cat/wp-content/uploads/2016/08/ernest-1.jpg',
 				credits: 'insernestlluch.cat',
+				link: 'insernestlluch.cat',
 			},
 		],
 	},
@@ -84,7 +81,7 @@ export const schoolData: Array<School> = [
 		id: 2,
 		name: 'Institut Viladomat',
 		type: 'public',
-		phase: ['secondary'],
+		phase: ['secondary', 'postsecondary'],
 		properties: {
 			location: [41.3824, 2.1544],
 			address: 'C/Consell de Cent 148-150, 08015 Barcelona',
@@ -120,7 +117,7 @@ export const schoolData: Array<School> = [
 		id: 4,
 		name: 'Escola Jesuïtes el Clot',
 		type: 'public-funded',
-		phase: ['primary', 'secondary'],
+		phase: ['primary', 'secondary', 'postsecondary'],
 		properties: {
 			location: [41.4128, 2.1904],
 			address: 'C/València 680, 08027 Barcelona',
@@ -136,7 +133,7 @@ export const schoolData: Array<School> = [
 		id: 5,
 		name: 'Institut Poeta Maragall',
 		type: 'public',
-		phase: ['secondary'],
+		phase: ['secondary', 'postsecondary'],
 		properties: {
 			location: [41.3913, 2.1567],
 			address: 'C/Provença 187, 08036 Barcelona',
@@ -152,7 +149,7 @@ export const schoolData: Array<School> = [
 		id: 6,
 		name: 'Institut Milà i Fontanals',
 		type: 'public',
-		phase: ['secondary'],
+		phase: ['secondary', 'postsecondary'],
 		properties: {
 			location: [41.3761, 2.1668],
 			address: 'Plaça de Josep M. Folch i Torres, 08001 Barcelona',
@@ -222,7 +219,7 @@ export const schoolData: Array<School> = [
 		id: 10,
 		name: 'Institut Montserrat',
 		type: 'public',
-		phase: ['secondary'],
+		phase: ['secondary', 'postsecondary'],
 		properties: {
 			location: [41.4019, 2.1435],
 			address: 'C/Copèrnic 84, 08006 Barcelona',
@@ -234,11 +231,109 @@ export const schoolData: Array<School> = [
 		},
 		images: null,
 	},
+	{
+		id: 11,
+		name: 'Escola Francesc Macià',
+		type: 'public',
+		phase: ['primary'],
+		properties: {
+			location: [41.3749, 2.1479],
+			address: 'Pl. Espanya 2, 08014 Barcelona',
+			contact: {
+				phone: '934235085',
+				website: 'agora.xtec.cat/escola-francescmacia/',
+				email: 'a8002009@xtec.cat',
+			},
+			founded: 1930,
+		},
+		images: [
+			{
+				src: 'https://agora.xtec.cat/escola-francescmacia/wp-content/uploads/usu1684/2018/02/Imatge-escola.jpg',
+				credits: 'agora.xtec.cat/escola-francescmacia',
+				link: 'agora.xtec.cat/escola-francescmacia',
+			},
+		],
+	},
+	{
+		id: 12,
+		name: 'Institució Montserrat',
+		type: 'public-funded',
+		phase: ['primary', 'secondary'],
+		properties: {
+			location: [41.3748, 2.1378],
+			address: 'C/Cros 6-8, 08014 Barcelona',
+			contact: {
+				phone: '934210150',
+				website: 'institucio-montserrat.cat',
+				email: 'im@institucio-montserrat.cat',
+			},
+			founded: 1928,
+		},
+		images: [
+			{
+				src: 'http://www.institucio-montserrat.cat/wp-content/uploads/2019/05/escola-general.jpg',
+				credits: 'institucio-montserrat.cat',
+				link: 'institucio-montserrat.cat',
+			},
+		],
+	},
+	{
+		id: 13,
+		name: 'Escola Pau Vila',
+		type: 'public',
+		phase: ['primary'],
+		properties: {
+			location: [41.3671, 2.1425],
+			address: 'C/Font Florida 95-131, 08004 Barcelona',
+			contact: {
+				phone: '934229840',
+				website: 'agora.xtec.cat/esc-pauvilabcn/',
+				email: 'a8041969@xtec.cat',
+			},
+			founded: 1980,
+		},
+		images: null,
+	},
+	{
+		id: 14,
+		name: 'Escola Fort Pienc',
+		type: 'public',
+		phase: ['primary'],
+		properties: {
+			location: [41.3951, 2.1826],
+			address: 'C/Alí Bei 75, 08013 Barcelona',
+			contact: {
+				phone: '932462999',
+				website: 'www.escolafortpienc.cat/',
+				email: 'a8052657@xtec.cat',
+			},
+			founded: 2003,
+		},
+		images: null,
+	},
+	{
+		id: 15,
+		name: 'Institut Fort Pius',
+		type: 'public',
+		phase: ['secondary', 'postsecondary'],
+		properties: {
+			location: [41.3943, 2.1798],
+			address: 'C/Ausiàs Marc 78, 08013 Barcelona',
+			contact: {
+				phone: '932316013',
+				website: 'www.insfortpius.cat/',
+			},
+			founded: 1984,
+		},
+		images: null,
+	},
 ];
 
-export function convert(str: Phase[] | SchoolType, type: 'phase' | 'type') {
+export function convert(
+	str: SchoolPhase[] | SchoolType,
+	type: 'phase' | 'type'
+) {
 	if (type === 'phase') {
-		// @ts-ignore
 		if (str.length === 2) {
 			return 'Primària i secundària';
 		} else if (str[0] === 'secondary') {
@@ -251,7 +346,6 @@ export function convert(str: Phase[] | SchoolType, type: 'phase' | 'type') {
 			public: 'Públic',
 			'public-funded': 'Concertat',
 			private: 'Privat',
-			// @ts-ignore
-		}[str];
+		}[str as SchoolType];
 	}
 }

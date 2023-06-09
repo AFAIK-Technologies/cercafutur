@@ -15,7 +15,7 @@ const routes: Array<RouteRecordRaw> = [
 	...redirects,
 	{
 		path: '/tabs/',
-		component: TabsPage,
+		component: () => import('@/views/TabsPage.vue'),
 		children: [
 			{
 				path: '',
@@ -35,6 +35,10 @@ const routes: Array<RouteRecordRaw> = [
 	{
 		path: '/school/:id/rate',
 		component: () => import('@/views/rate.vue'),
+	},
+	{
+		path: '/location',
+		component: () => import('@/views/location.vue'),
 	},
 ];
 

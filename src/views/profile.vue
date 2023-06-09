@@ -1,7 +1,6 @@
 <template>
 	<TabLayout :loading="loading">
 		<div v-if="userLoaded && user && !submitted">
-			{{}}
 			<ion-list lines="inset">
 				<ion-item>
 					Nom d'usuari:
@@ -14,8 +13,8 @@
 					<b style="margin-left: 0.25rem">{{ user?.providerData[0]?.email }}</b>
 				</ion-item>
 			</ion-list>
-			<ion-button style="margin-top: 1rem" @click="signOut"
-				>Tanca la sessió</ion-button
+			<ion-button style="margin-top: 1rem" @click="presentActionSheet"
+				>Administra</ion-button
 			>
 		</div>
 		<div v-else>
@@ -39,88 +38,107 @@
 					<ion-label>Iniciar sessió</ion-label>
 				</ion-segment-button>
 			</ion-segment>
-			<ion-list v-if="section === 'signin'" class="input-list">
-				<ion-item>
-					<ion-input
-						:class="{ 'ion-invalid ion-touched': signInError }"
-						label-placement="floating"
-						label="Correu electrònic"
-						type="email"
-						placeholder="correu@exemple.com"
-						error-text="Correu electrònic o contrasenya incorrectes"
-						v-model="inputEmailSignin"
-					></ion-input>
-				</ion-item>
-				<ion-item>
-					<ion-input
-						label-placement="floating"
-						label="Contrasenya"
-						type="password"
-						v-model="inputPasswordSignin"
-					></ion-input>
-				</ion-item>
-			</ion-list>
-			<ion-list v-else class="input-list">
-				<ion-item>
-					<ion-input
-						:class="{ 'ion-invalid ion-touched': signUpError.usernameTooShort }"
-						label-placement="floating"
-						label="Nom d'usuari"
-						:counter="true"
-						autocomplete="off"
-						maxlength="20"
-						v-model="inputUsernameSignup"
-						helper-text="4 caràcters com a mínim."
-						error-text="4 caràcters com a mínim."
-					></ion-input>
-				</ion-item>
-				<ion-item>
-					<ion-input
-						:class="{ 'ion-invalid ion-touched': signUpError.emailCheckFail }"
-						label-placement="floating"
-						label="Correu electrònic"
-						type="email"
-						placeholder="correu@exemple.com"
-						autocomplete="email"
-						v-model="inputEmailSignup"
-						error-text="Adreça invàlida"
-					></ion-input>
-				</ion-item>
-				<ion-item>
-					<ion-input
-						label-placement="floating"
-						label="Contrasenya"
-						type="password"
-						autocomplete="new-password"
-						:counter="true"
-						minlength="8"
-						helper-text="8 caràcters com a mínim amb lletres majúscules i minúscules i algun nombre i símbol."
-						v-model="inputPasswordSignup"
-						:class="{
-							'ion-invalid ion-touched': signUpError.passwordCheckFail,
-						}"
-						error-text="8 caràcters com a mínim amb lletres majúscules i minúscules i algun nombre i símbol."
-					></ion-input>
-				</ion-item>
-				<ion-item>
-					<ion-input
-						label-placement="floating"
-						label="Confirma contrasenya"
-						type="password"
-						autocomplete="off"
-						:counter="true"
-						minlength="8"
-						v-model="inputPasswordRepeatSignup"
-						:class="{
-							'ion-invalid ion-touched': signUpError.passwordsNotMatch,
-						}"
-						error-text="Les contrasenyes no són iguals."
-					></ion-input>
-				</ion-item>
-			</ion-list>
-			<ion-button @click="submit">{{
-				section === 'signup' ? 'Crear un compte' : 'Iniciar sessió'
-			}}</ion-button>
+			<div
+				style="
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					place-items: center;
+				"
+			>
+				<ion-list v-if="section === 'signin'" class="input-list">
+					<ion-item>
+						<ion-input
+							:class="{ 'ion-invalid ion-touched': signInError }"
+							label-placement="floating"
+							label="Correu electrònic"
+							type="email"
+							placeholder="correu@exemple.com"
+							error-text="Correu electrònic o contrasenya incorrectes"
+							v-model="inputEmailSignin"
+						></ion-input>
+					</ion-item>
+					<ion-item>
+						<ion-input
+							label-placement="floating"
+							label="Contrasenya"
+							type="password"
+							v-model="inputPasswordSignin"
+						></ion-input>
+					</ion-item>
+				</ion-list>
+				<ion-list v-else class="input-list">
+					<ion-item>
+						<ion-input
+							:class="{
+								'ion-invalid ion-touched': signUpError.usernameTooShort,
+							}"
+							label-placement="floating"
+							label="Nom d'usuari"
+							:counter="true"
+							autocomplete="off"
+							maxlength="20"
+							v-model="inputUsernameSignup"
+							helper-text="4 caràcters com a mínim."
+							error-text="4 caràcters com a mínim."
+						></ion-input>
+					</ion-item>
+					<ion-item>
+						<ion-input
+							:class="{ 'ion-invalid ion-touched': signUpError.emailCheckFail }"
+							label-placement="floating"
+							label="Correu electrònic"
+							type="email"
+							placeholder="correu@exemple.com"
+							autocomplete="email"
+							v-model="inputEmailSignup"
+							error-text="Adreça invàlida"
+						></ion-input>
+					</ion-item>
+					<ion-item>
+						<ion-input
+							label-placement="floating"
+							label="Contrasenya"
+							type="password"
+							autocomplete="new-password"
+							:counter="true"
+							minlength="8"
+							helper-text="8 caràcters com a mínim amb lletres majúscules i minúscules i algun nombre i símbol."
+							v-model="inputPasswordSignup"
+							:class="{
+								'ion-invalid ion-touched': signUpError.passwordCheckFail,
+							}"
+							error-text="8 caràcters com a mínim amb lletres majúscules i minúscules i algun nombre i símbol."
+						></ion-input>
+					</ion-item>
+					<ion-item>
+						<ion-input
+							label-placement="floating"
+							label="Confirma contrasenya"
+							type="password"
+							autocomplete="off"
+							:counter="true"
+							minlength="8"
+							v-model="inputPasswordRepeatSignup"
+							:class="{
+								'ion-invalid ion-touched': signUpError.passwordsNotMatch,
+							}"
+							error-text="Les contrasenyes no són iguals."
+						></ion-input>
+					</ion-item>
+					<!--
+					<ion-item>
+						<ion-select placeholder="Selecciona..." label="Rol">
+							<ion-select-option value="parent">Pare / mare</ion-select-option>
+							<ion-select-option value="student">Alumne</ion-select-option>
+							<ion-select-option value="teacher">Professor</ion-select-option>
+							<ion-select-option value="other">Altres</ion-select-option>
+						</ion-select>
+					</ion-item>--> </ion-list
+				><ion-button style="max-width: 520px" @click="submit">{{
+					section === 'signup' ? 'Crear un compte' : 'Iniciar sessió'
+				}}</ion-button>
+			</div>
 		</div>
 		<p>
 			CercaFutur utilitza Firebase Auth per l'autenticació. Totes les dades
@@ -132,6 +150,8 @@
 <script setup lang="ts">
 import {
 	IonSegment,
+	IonSelect,
+	IonSelectOption,
 	IonList,
 	IonItem,
 	IonInput,
@@ -143,6 +163,7 @@ import {
 
 import TabLayout from '@/layout/tabLayout.vue';
 import {
+	getCurrentUser,
 	useCurrentUser,
 	useFirebaseAuth,
 	useIsCurrentUserLoaded,
@@ -171,6 +192,7 @@ const inputEmailSignup = ref('');
 const inputUsernameSignup = ref('');
 const inputPasswordSignup = ref('');
 const inputPasswordRepeatSignup = ref('');
+const role = ref('');
 
 const inputs = reactive({
 	signin: {
@@ -204,7 +226,6 @@ function submit(e: CustomEvent) {
 			inputs.signin.email,
 			inputs.signin.password
 		)
-			.then((userCredential) => {})
 			.catch((error) => {
 				reportError(error, 'Inici de sessió fallat.');
 			})
@@ -293,7 +314,7 @@ async function reportError(error: any, header: string) {
 	await alert.present();
 }
 
-async function signOut(e: CustomEvent) {
+async function signOut() {
 	//@ts-ignore
 	const prevName = auth.currentUser.providerData[0].displayName;
 	await auth.signOut();
@@ -301,30 +322,29 @@ async function signOut(e: CustomEvent) {
 	const alert = await alertController.create({
 		header: 'Sessió tancada',
 		message: `La sessió de ${prevName} ha estat tancada.`,
-		buttons: ['OK'],
+		buttons: ["D'acord"],
 	});
 
 	await alert.present();
 }
 /*
 const result = ref('');
-
+*/
 const presentActionSheet = async () => {
 	const actionSheet = await actionSheetController.create({
 		header: 'Administració del compte',
-		subHeader: 'Escull una acció',
 		buttons: [
 			{
-				text: 'Eliminar compte',
+				text: 'Tancar la sessió',
 				role: 'destructive',
 				data: {
-					action: 'deleteAccount',
+					action: 'signOut',
 				},
 			},
 			{
-				text: 'Tancar la sessió',
+				text: "Veure ID d'usuari",
 				data: {
-					action: 'signOut',
+					action: 'viewId',
 				},
 			},
 			{
@@ -340,9 +360,19 @@ const presentActionSheet = async () => {
 	await actionSheet.present();
 
 	const res = await actionSheet.onDidDismiss();
-};
+	if (res.data?.action === 'signOut') {
+		signOut();
+	} else if (res.data?.action === 'viewId') {
+		const thisUser = await getCurrentUser();
+		const alert = await alertController.create({
+			header: "ID d'usuari",
+			message: `El teu ID d'usuari és: \n ${auth.currentUser?.uid}.`,
+			buttons: ["D'acord"],
+		});
 
- */
+		await alert.present();
+	}
+};
 </script>
 
 <style>
@@ -352,5 +382,10 @@ ion-input {
 
 .input-list > ion-item {
 	margin-bottom: 0.25rem;
+	max-width: 520px;
+}
+
+.action-sheet-destructive {
+	color: #c10000 !important;
 }
 </style>
