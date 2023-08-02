@@ -96,7 +96,7 @@ async function update() {
 
 update();
 
-watch([order], update);
+watch([order, searchQuery], update);
 
 function handleSortChange(event: any) {
 	order.value = event.target.value;
