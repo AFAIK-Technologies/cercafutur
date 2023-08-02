@@ -347,6 +347,13 @@ const presentActionSheet = async () => {
 					action: 'viewId',
 				},
 			},
+			// TODO
+			// {
+			//	text: "Canviar nom d'usuari",
+			//	data: {
+			//		action: 'changeUsername',
+			//	},
+			//},
 			{
 				text: 'Cancel·lar',
 				role: 'cancel',
@@ -362,6 +369,29 @@ const presentActionSheet = async () => {
 	const res = await actionSheet.onDidDismiss();
 	if (res.data?.action === 'signOut') {
 		signOut();
+	} else if (res.data?.action === 'changeUsername') {
+		const alert = await alertController.create({
+			header: "Canviar nom d'usuari",
+			message: auth.currentUser?.displayName
+				? `El teu nom d'usuari és: ${auth.currentUser?.displayName}.`
+				: "No tens cap nom d'usuari establert.",
+			inputs: [
+				{
+					type: 'text',
+					placeholder: "Nou nom d'usuari",
+				},
+			],
+			buttons: [
+				{
+					text: 'Cancel·lar',
+					role: 'cancel',
+				},
+				{
+					text: "D'acord",
+				},
+			],
+		});
+		alert.present();
 	} else if (res.data?.action === 'viewId') {
 		const thisUser = await getCurrentUser();
 		const alert = await alertController.create({
