@@ -15,7 +15,7 @@ import { IonApp, IonRouterOutlet } from '@ionic/vue';
 }
 
 .schoolgrid > ion-card {
-	margin: 10px 10px 0;
+	margin: 10px 10px;
 }
 @media (min-width: 640px) {
 	.schoolgrid {
