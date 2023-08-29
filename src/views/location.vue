@@ -11,6 +11,7 @@
 		<ion-content class="ion-padding">
 			<div style="height: 75vh; margin-bottom: 0.5rem">
 				<l-map
+					id="map"
 					v-model="center"
 					v-model:zoom="zoom"
 					v-model:center="center"
@@ -30,11 +31,25 @@
 					<l-circle-marker :lat-lng="center"></l-circle-marker>
 				</l-map>
 			</div>
+			<b>
+				{{
+					geo.geocoding
+						? geo.customAddress
+						: `Coordenades: ${
+								Math.round(
+									(Array.isArray(center) ? center[0] : center.lat) * 10e4
+								) / 10e4
+						  }, ${
+								Math.round(
+									(Array.isArray(center) ? center[1] : center.lng) * 10e4
+								) / 10e4
+						  }`
+				}}
+			</b>
 			<div style="display: flex; justify-content: space-between">
 				<ion-button @click="router.back()">Cancel·lar</ion-button>
 				<ion-button @click="handleDone">Fet</ion-button>
 			</div>
-			Coordenades: {{ center }}
 		</ion-content>
 	</ion-page>
 </template>
@@ -71,11 +86,24 @@ const router = useRouter();
 const geo = useGeoStore();
 const schools = useSchoolsStore();
 
-const center = ref(geo.customGeo ? geo.geoAsArray : [41.37836, 2.1503]);
+const center = ref(
+	geo.customGeo ? geo.geoAsArray : { lat: 41.3783, lng: 2.1503 }
+);
 
-function handleMove(pos: { lat: number; lng: number }) {
+async function handleMove(pos: { lat: number; lng: number }) {
 	center.value[0] = pos.lat;
 	center.value[1] = pos.lng;
+	if (geo.geocoding) {
+		const response = await fetch(
+			`https://maps.googleapis.com/maps/api/geocode/json?latlng=${pos.lat},${
+				pos.lng
+			}&key=${import.meta.env.VITE_MAPS_API_KEY}`
+		);
+		geo.customAddress = (await response.json()).results[0].formatted_address;
+	}
+}
+if (!geo.geocoding) {
+	console.warn("Clau d'API de Google Maps no proporcionada.");
 }
 function handleDone() {
 	geo.data.latitude = center.value[0];

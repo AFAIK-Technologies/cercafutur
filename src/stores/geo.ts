@@ -15,6 +15,9 @@ export const useGeoStore = defineStore('geo', {
 			lastCustom: { latitude: 41.3783, longitude: 2.1503 },
 			lastError: null as null | GeolocationPositionError,
 			justChangedCustom: false,
+			customAddress:
+				'C. de Vilamar\u00ed, 66, 08015 Barcelona, Espanya' as string,
+			geocoding: import.meta.env.VITE_MAPS_API_KEY as boolean,
 		};
 	},
 	getters: {
