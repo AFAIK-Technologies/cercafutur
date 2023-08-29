@@ -1,6 +1,23 @@
 <template>
 	<TabLayout :loading="loading">
 		<div v-if="userLoaded && user && !submitted">
+			<div
+				style="
+					background: rgb(235, 68, 90, 0.4);
+					padding: 8px;
+					border-radius: 4px;
+				"
+				v-if="!user.emailVerified"
+			>
+				<ion-text style="display: block; margin-bottom: 8px"
+					>El correu elèctrònic no està verificat. No podràs fer ressenyes fins
+					que ho facis.</ion-text
+				>
+				<ion-button @click="resendVerification" color="dark" fill="outline"
+					>Reenviar verificació</ion-button
+				>
+			</div>
+
 			<ion-list lines="inset">
 				<ion-item>
 					Nom d'usuari:
@@ -159,6 +176,7 @@ import {
 	IonButton,
 	alertController,
 	actionSheetController,
+	useIonRouter,
 } from '@ionic/vue';
 
 import TabLayout from '@/layout/tabLayout.vue';
@@ -173,13 +191,18 @@ import {
 	createUserWithEmailAndPassword,
 	Auth,
 	updateProfile,
-	User,
+	sendEmailVerification,
 } from 'firebase/auth';
-import { reactive, ref } from 'vue';
+import { reactive, ref, watchEffect } from 'vue';
+import { useRoute } from 'vue-router';
+import { doc, setDoc } from 'firebase/firestore';
 
-const user = useCurrentUser() as unknown as User;
+const user = useCurrentUser();
 const userLoaded = useIsCurrentUserLoaded();
 const auth = useFirebaseAuth() as Auth;
+const firestore = useFirestore();
+const route = useRoute();
+const router = useIonRouter();
 
 const sectionEl = ref();
 const section = ref('signup');
@@ -266,6 +289,11 @@ function submit(e: CustomEvent) {
 			signUpError.passwordsNotMatch = true;
 			return;
 		}
+
+		if (Object.values(signUpError).includes(true)) return;
+
+		// TODO Comprovar ús del nom
+
 		loading.value = true;
 		createUserWithEmailAndPassword(
 			auth,
@@ -273,6 +301,7 @@ function submit(e: CustomEvent) {
 			inputs.signup.password
 		)
 			.then((userCredential) => {
+				// Nom d'usuari
 				//@ts-ignore
 				updateProfile(auth.currentUser, {
 					displayName: inputs.signup.username,
@@ -403,6 +432,56 @@ const presentActionSheet = async () => {
 		await alert.present();
 	}
 };
+
+function resendVerification() {
+	loading.value = true;
+	sendEmailVerification(auth.currentUser)
+		.then(async () => {
+			loading.value = false;
+			const alert = await alertController.create({
+				header: 'Correu de verificació enviat',
+				message: `Fes clic a l'enllaç que has rebut a ${user.value.email}.`,
+				buttons: ["D'acord"],
+			});
+			await alert.present();
+		})
+		.catch(async (e) => {
+			loading.value = false;
+			if (e.message.includes('auth/too-many-requests')) {
+				const alert = await alertController.create({
+					header: 'Error en enviar correu de verificació',
+					message: `Espera una estona abans d'enviar-ne un altre.`,
+					buttons: ["D'acord"],
+				});
+				await alert.present();
+			} else reportError(e, 'Error en enviar correu de verificació');
+		});
+	// .finally() s'executa quan .then() ha acabat, fet que causa que loading sigui true
+	// fins que l'alerta s'amaga.
+}
+
+watchEffect(async () => {
+	if (route.query.unverified) {
+		const alert = await alertController.create({
+			header: 'Correu electrònic no verificat',
+			message:
+				"No has verificat l'adreça de correu electrònic. Vols tornar a enviar el correu de verificació?",
+			buttons: [
+				{
+					text: 'Cancel·lar',
+					role: 'cancel',
+				},
+				{
+					text: 'Reenviar',
+				},
+			],
+		});
+		router.replace('/tabs/profile');
+		await alert.present();
+
+		const res = await alert.onDidDismiss();
+	}
+});
 </script>
 
 <style>

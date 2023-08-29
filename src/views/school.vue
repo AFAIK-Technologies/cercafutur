@@ -249,6 +249,7 @@ import { Browser } from '@capacitor/browser';
 import { Clipboard } from '@capacitor/clipboard';
 import { useGeoStore } from '@/stores/geo';
 import { useSchoolsStore } from '@/stores/schools';
+import { User } from 'firebase/auth';
 
 const route = useRoute();
 const ionRouter = useIonRouter();
@@ -271,6 +272,7 @@ const score: Ref<number | null> = ref(null);
 const imageIndex = ref(0);
 
 const geo = useGeoStore();
+const user = useCurrentUser() as unknown as Ref<User>;
 const coords = ref<null | [number, number]>(null);
 
 geo.updateGeo().then(() => {
@@ -337,11 +339,16 @@ async function presentToast(text: string) {
 }
 
 function rateRedirect(e: CustomEvent) {
-	if (useCurrentUser().value) {
+	console.log('rate');
+	console.log(user.value);
+
+	if (user.value && user.value.emailVerified) {
 		ionRouter.back;
 		ionRouter.push(`/school/${school.value?.id}/rate`);
 	} else {
-		ionRouter.push('../tabs/profile');
+		ionRouter.push(
+			'/tabs/profile' + (user.value.emailVerified ? '' : '?unverified=true')
+		);
 	}
 }
 </script>
