@@ -21,9 +21,10 @@ import '@ionic/vue/css/display.css';
 import './theme/variables.css';
 import { VueFire, VueFireAuth } from 'vuefire';
 
+import 'leaflet/dist/leaflet.css';
+
 // Firebase
 import { firebaseApp } from '@/firestore';
-import * as firebaseui from 'firebaseui';
 import { getAuth } from 'firebase/auth';
 
 import 'firebaseui/dist/firebaseui.css';

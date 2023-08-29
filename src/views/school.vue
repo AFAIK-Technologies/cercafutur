@@ -231,7 +231,6 @@ import {
 	LControlLayers,
 	LCircleMarker,
 } from '@vue-leaflet/vue-leaflet';
-import 'leaflet/dist/leaflet.css';
 import { star, starOutline, starHalf } from 'ionicons/icons';
 import { useRoute } from 'vue-router';
 import { Review, convert, SchoolFull } from '@/data';
