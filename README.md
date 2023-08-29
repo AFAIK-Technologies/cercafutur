@@ -1,4 +1,4 @@
-# cercafutur
+# CercaFutur
 CercaFutur és una aplicació per a mòbils; un cercador d'escoles i instituts amb filtres avançats, un mapa i compte 
 d'usuari. Creat amb Vue i Ionic Framework.
 
@@ -19,6 +19,10 @@ Ho sentim, usuaris d'iPhone&mdash;no tenim plans per llançar CercaFutur a l'App
 - **Android Studio**
 
 ## Instal·lació
+### Amb GitHub Codespaces
+Es recomana utilitzar GitHub Codespaces quan utilitzar un IDE local no sigui una opció (per exemple, en Chromebooks).
+
+### Localment
 1. Clonar repositori.
 ```shell
 git clone https://github.com/AFAIK-Technologies/cercafutur.git
@@ -30,7 +34,7 @@ npm i
 ```
 3. Assignar variables d'entorn.
 
-Copia el fitxer `.env.example` a `.env` i edita aquest nou fitxer. Estableix tots els valors per configurar el Firebase.
+Copia el fitxer `.env.example` a `.env` i edita aquest nou fitxer. Estableix tots els valors per configurar el Firebase. La clau de l'API de Google Maps és opcional.
 
 Pots fer-ho des de la terminal amb les següents comandes:
 ```shell
@@ -44,7 +48,7 @@ ionic serve
 ```
 5. Obrir el projecte a Android Studio.
 ```shell
-ionic capacitor copy android
+ionic capacitor sync android
 ionic capacitor open android
 ```
 6. Iniciar el projecte des d'Android Studio clicant el botó d'executar.
