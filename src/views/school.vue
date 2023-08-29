@@ -136,7 +136,7 @@
 						>Adreça:
 						<b
 							@click="
-								writeToClipboard(school?.properties.address);
+								writeToClipboard(school?.properties.address!);
 								presentToast('Adreça copiada al portaretalls');
 							"
 							style="margin-left: 0.25rem"
@@ -147,14 +147,14 @@
 				<h3>Contacte</h3>
 				<ion-list v-if="school">
 					<ion-item v-if="school?.properties.contact?.website"
-						><a @click="openBrowser(school?.properties.contact?.website)"
+						><a @click="openBrowser(school?.properties.contact?.website!)"
 							>Pàgina web: <u>{{ school?.properties.contact?.website }}</u></a
 						></ion-item
 					>
 					<ion-item v-if="school?.properties.contact?.phone">
 						<a
 							@click="
-								writeToClipboard(school?.properties.contact?.phone);
+								writeToClipboard(school?.properties.contact?.phone!);
 								presentToast('Telèfon copiat al portaretalls');
 							"
 						>
@@ -164,7 +164,7 @@
 					<ion-item v-if="school?.properties.contact?.email">
 						<a
 							@click="
-								writeToClipboard(school?.properties.contact?.email);
+								writeToClipboard(school?.properties.contact?.email!);
 								presentToast('Correu electrònic copiat al portaretalls');
 							"
 						>
