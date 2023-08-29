@@ -126,6 +126,24 @@ async function submit() {
 		});
 	}
 
+	const userRef = doc(useFirestore(), 'users/' + user.value.uid);
+
+	const existUserRef = await getDoc(userRef);
+
+	if (!existUserRef.exists()) {
+		const alert = await alertController.create({
+			header: 'Compte antic',
+			message:
+				"El teu perfil ha estat creat amb una versió antiga de CercaFutur. Crea'n un altre o actualitza el teu perfil.",
+			buttons: [
+				{
+					text: "D'acord",
+				},
+			],
+		});
+		await alert.present();
+	}
+
 	router.back();
 }
 </script>
