@@ -58,6 +58,7 @@ import {
 	IonRange,
 	IonText,
 	IonTextarea,
+	alertController,
 } from '@ionic/vue';
 import { useRoute, useRouter } from 'vue-router';
 import { schoolData } from '@/data';
@@ -79,39 +80,34 @@ const stars = ref(0);
 const text = ref('');
 
 const user = useCurrentUser();
+const firestore = useFirestore();
 
 async function submit() {
+	if (!user.value?.uid) return;
 	// Ressenya
-	const snap = await getDoc(
-		doc(useFirestore(), 'reviews', route.params.id[0].toString())
-	);
+	const schoolRef = doc(firestore, 'reviews', route.params.id[0].toString());
+	const snap = await getDoc(schoolRef);
 	if (snap.data() === undefined) {
-		await setDoc(
-			doc(useFirestore(), 'reviews', route.params.id[0].toString()),
-			{
-				count: 1,
-				total: stars.value,
-			}
-		);
+		await setDoc(schoolRef, {
+			count: 1,
+			total: stars.value,
+		});
 	} else {
-		await updateDoc(
-			doc(useFirestore(), 'reviews', route.params.id[0].toString()),
-			{
-				count: increment(1),
-				total: increment(stars.value),
-			}
-		);
+		await updateDoc(schoolRef, {
+			count: increment(1),
+			total: increment(stars.value),
+		});
 	}
 
-	let docRef = doc(
-		useFirestore(),
+	const reviewRef = doc(
+		firestore,
 		'reviews/' + route.params.id[0] + '/list/',
 		snap?.data()?.count ? (snap?.data()?.count + 1).toString() : '1'
 	);
 
-	const existSnap = await getDoc(docRef);
+	const existSnap = await getDoc(reviewRef);
 	if (existSnap.exists()) {
-		await updateDoc(docRef, {
+		await updateDoc(reviewRef, {
 			author: {
 				email: user.value?.email,
 				name: user.value?.displayName,
@@ -120,7 +116,7 @@ async function submit() {
 			text: text.value.trim(),
 		});
 	} else {
-		await setDoc(docRef, {
+		await setDoc(reviewRef, {
 			author: {
 				email: user.value?.email,
 				name: user.value?.displayName,
