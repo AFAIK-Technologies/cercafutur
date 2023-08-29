@@ -402,13 +402,12 @@ const presentActionSheet = async () => {
 					action: 'viewId',
 				},
 			},
-			// TODO
-			// {
-			//	text: "Canviar nom d'usuari",
-			//	data: {
-			//		action: 'changeUsername',
-			//	},
-			//},
+			{
+				text: "Canviar nom d'usuari",
+				data: {
+					action: 'changeUsername',
+				},
+			},
 			{
 				text: 'Cancel·lar',
 				role: 'cancel',
@@ -425,28 +424,64 @@ const presentActionSheet = async () => {
 	if (res.data?.action === 'signOut') {
 		signOut();
 	} else if (res.data?.action === 'changeUsername') {
-		const alert = await alertController.create({
-			header: "Canviar nom d'usuari",
-			message: auth.currentUser?.displayName
-				? `El teu nom d'usuari és: ${auth.currentUser?.displayName}.`
-				: "No tens cap nom d'usuari establert.",
-			inputs: [
-				{
-					type: 'text',
-					placeholder: "Nou nom d'usuari",
-				},
-			],
-			buttons: [
-				{
-					text: 'Cancel·lar',
-					role: 'cancel',
-				},
-				{
-					text: "D'acord",
-				},
-			],
-		});
-		alert.present();
+		let newUsername: string | null = null;
+		while (
+			newUsername === null ||
+			newUsername.length < 4 ||
+			!checkUsername(newUsername)
+		) {
+			const alert = await alertController.create({
+				header: "Canviar nom d'usuari",
+				message:
+					(auth.currentUser?.displayName
+						? `El teu nom d'usuari és: ${auth.currentUser?.displayName}.`
+						: "No tens cap nom d'usuari establert.") +
+					' Ha de ser entre 4 i 20 caràcters i pot contenir lletres majúscules i minúscules, nombres i algun símbol.',
+				inputs: [
+					{
+						type: 'text',
+						placeholder: "Nou nom d'usuari",
+						attributes: {
+							maxlength: 20,
+						},
+					},
+				],
+				buttons: [
+					{
+						text: 'Cancel·lar',
+						role: 'cancel',
+					},
+					{
+						text: "D'acord",
+					},
+				],
+			});
+			await alert.present();
+			const resUsername = await alert.onDidDismiss();
+			newUsername = resUsername.data.values[0];
+			if (newUsername === '' || resUsername.role === 'cancel') return;
+		}
+		console.log(newUsername);
+
+		updateProfile(auth.currentUser, {
+			displayName: newUsername,
+		})
+			.then(async () => {
+				const alert = await alertController.create({
+					header: "Nom d'usuari establert",
+					message: `S'ha canviat el teu nom d'usuari a ${auth.currentUser?.displayName}. És possible que els canvis triguin una estona a aplicar-se.`,
+					buttons: [
+						{
+							text: "D'acord",
+						},
+					],
+				});
+				await alert.present();
+			})
+			.catch((error) => {
+				console.log(error);
+				reportError(error, 'Error en establir el nom');
+			});
 	} else if (res.data?.action === 'viewId') {
 		const thisUser = await getCurrentUser();
 		const alert = await alertController.create({
