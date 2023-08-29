@@ -2,7 +2,12 @@
 	<ion-page>
 		<ion-header>
 			<ion-toolbar>
-				<ion-title>{{ route.name }}</ion-title>
+				<ion-title>
+					<div style="display: flex; justify-content: space-between">
+						<span>{{ route.name }}</span>
+						<span><span>Cerca</span>Futur</span>
+					</div>
+				</ion-title>
 				<ion-progress-bar
 					type="indeterminate"
 					:style="{ display: loading ? 'block' : 'none' }"
