@@ -287,7 +287,6 @@ function submit() {
 		}
 		if (!checkEmail(inputs.signup.email)) {
 			signUpError.emailCheckFail = true;
-			return;
 		}
 
 		if (
@@ -296,11 +295,9 @@ function submit() {
 			)
 		) {
 			signUpError.passwordCheckFail = true;
-			return;
 		}
 		if (inputs.signup.passwordRepeat !== inputs.signup.password) {
 			signUpError.passwordsNotMatch = true;
-			return;
 		}
 
 		if (Object.values(signUpError).includes(true)) return;
