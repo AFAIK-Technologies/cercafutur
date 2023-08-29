@@ -9,7 +9,14 @@ import {
 
 import { useGeoStore } from '@/stores/geo';
 import { distancekm } from '@/utils';
-import { query, collection, where, getDocs } from 'firebase/firestore';
+import {
+	query,
+	collection,
+	where,
+	getDocs,
+	doc,
+	getDoc,
+} from 'firebase/firestore';
 import { useFirestore } from 'vuefire';
 import { Network } from '@capacitor/network';
 
@@ -61,10 +68,24 @@ export const useSchoolsStore = defineStore('schools', {
 			}
 			this.fetched.push('distance');
 		},
-		async updateScores(force = false) {
-			if (!this.fetched.includes('scores') || force) {
+		/**
+		 * Actualitza la puntuació de tot el centre.
+		 *
+		 * @param force - Forçar l'actualització encara que ja s'hagi fet anteriorment.
+		 * @param id - Actualitzar la puntuació d'un centre concret.
+		 */
+		async updateScores(force = false, id?: number) {
+			const firestore = useFirestore();
+			if (id) {
+				const schoolRef = doc(firestore, 'reviews/' + id);
+				const snapshot = await getDoc(schoolRef);
+				this.schoolList.find((school) => school.id === id).rates = {
+					list: [] as Review[],
+					...(snapshot.data() as Score),
+				};
+			} else if (!this.fetched.includes('scores') || force) {
 				const q = query(
-					collection(useFirestore(), 'reviews'),
+					collection(firestore, 'reviews'),
 					where(
 						'__name__',
 						'in',
