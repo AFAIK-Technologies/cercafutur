@@ -30,9 +30,7 @@
 					<b style="margin-left: 0.25rem">{{ user?.providerData[0]?.email }}</b>
 				</ion-item>
 			</ion-list>
-			<ion-button style="margin-top: 1rem" @click="presentActionSheet"
-				>Administra</ion-button
-			>
+			<ion-button @click="presentActionSheet">Administra</ion-button>
 		</div>
 		<div v-else>
 			<ion-text>
