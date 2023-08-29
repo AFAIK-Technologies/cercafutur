@@ -139,6 +139,7 @@ async function checkGPSError() {
 
 const gpsChange = ref(false);
 
+// En canviar mode de localització
 watch(locationSource, async () => {
 	loading.value = true;
 	gpsChange.value = true;
@@ -160,7 +161,7 @@ watch(locationSource, async () => {
 await bloqueja el renderitzat del component
 https://stackoverflow.com/questions/69183835/vue-script-setup-top-level-await-causing-template-not-to-render
  */
-const geoData2 = geo.updateGeo().then(async () => {
+geo.updateGeo().then(async () => {
 	if (geo.lastError) {
 		geo.customGeo = true;
 		locationSource.value = 'custom';

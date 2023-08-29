@@ -247,7 +247,7 @@ const signUpError = reactive({
 });
 const submitted = ref(false);
 
-function submit(e: CustomEvent) {
+function submit() {
 	submitted.value = true;
 	if (section.value === 'signin') {
 		loading.value = true;
@@ -266,7 +266,7 @@ function submit(e: CustomEvent) {
 			});
 	} else {
 		const fields = [];
-		for (let errorKey in signUpError) {
+		for (const errorKey in signUpError) {
 			//@ts-ignore
 			signUpError[errorKey] = false;
 		}
