@@ -1,10 +1,12 @@
 import { defineStore, storeToRefs } from 'pinia';
 import {
+	Review,
 	School,
 	schoolData,
 	SchoolFull,
 	SchoolPhase,
 	SchoolType,
+	Score,
 } from '@/data';
 
 import { useGeoStore } from '@/stores/geo';
@@ -98,14 +100,14 @@ export const useSchoolsStore = defineStore('schools', {
 						(o) => o.id === parseInt(item.id)
 					);
 					if (index !== -1) {
-						this.schoolList[index].rates = item.data() as {
-							count: number;
-							total: number;
+						this.schoolList[index].rates = {
+							list: [] as Review[],
+							...(item.data() as Score),
 						};
 					}
 				});
 			}
-			this.fetched.push('scores');
+			if (!this.fetched.includes('scores')) this.fetched.push('scores');
 		},
 		async getFiltered() {
 			// Iterar sobre centres

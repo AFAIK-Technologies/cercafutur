@@ -7,6 +7,11 @@ export interface Review {
 	text: string;
 }
 
+export interface Score {
+	count: number;
+	total: number;
+}
+
 export type SchoolType = 'public' | 'public-funded' | 'private';
 export type SchoolPhase = 'primary' | 'secondary' | 'postsecondary';
 
@@ -40,10 +45,8 @@ export interface School {
 }
 
 export interface SchoolFull extends School {
-	rates?: {
-		count: number;
-		total: number;
-		list?: Review[];
+	rates?: Score & {
+		list: Review[];
 	};
 	distance: number;
 }

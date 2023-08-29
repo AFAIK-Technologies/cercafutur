@@ -233,8 +233,8 @@ import {
 } from '@vue-leaflet/vue-leaflet';
 import { star, starOutline, starHalf } from 'ionicons/icons';
 import { useRoute } from 'vue-router';
-import { Review, convert, SchoolFull } from '@/data';
-import { Ref, ref, watchEffect, computed } from 'vue';
+import { Review, convert, Score } from '@/data';
+import { Ref, ref, computed } from 'vue';
 import {
 	collection,
 	query,
@@ -283,7 +283,7 @@ async function updateReviews() {
 		const docSnap = await getDoc(
 			doc(useFirestore(), 'reviews', route.params.id.toString())
 		);
-		school.value.rates = docSnap.data() as { count: number; total: number };
+		school.value.rates = docSnap.data() as Score;
 	}
 	const q = query(
 		collection(useFirestore(), `reviews/${route.params.id}/list`),
@@ -294,7 +294,7 @@ async function updateReviews() {
 	reviews.value = [];
 
 	snapshot.forEach((item) => {
-		reviews.value.push({
+		school.value.rates.list.push({
 			stars: item.data().stars,
 			author: { name: item.data().author.name },
 			text: item.data().text,
