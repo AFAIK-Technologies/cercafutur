@@ -96,8 +96,8 @@
 							autocomplete="off"
 							maxlength="20"
 							v-model="inputUsernameSignup"
-							helper-text="4 caràcters com a mínim."
-							error-text="4 caràcters com a mínim."
+							helper-text="Entre 4 i 20 caràcters. Pot contenir lletres majúscules i minúscules i nombres."
+							error-text="Entre 4 i 20 caràcters. Pot contenir lletres majúscules i minúscules i nombres."
 						></ion-input>
 					</ion-item>
 					<ion-item>
@@ -243,6 +243,7 @@ const signUpError = reactive({
 	passwordCheckFail: false,
 	emailCheckFail: false,
 	usernameTooShort: false,
+	usernameCheckFail: false,
 });
 const submitted = ref(false);
 
@@ -276,14 +277,21 @@ function submit(e: CustomEvent) {
 		if (fields.includes('')) {
 			return;
 		}
-		if (inputs.signup.username.length < 4) {
-			signUpError.usernameTooShort = true;
-			return;
+		username: {
+			if (inputs.signup.username.length < 4) {
+				signUpError.usernameTooShort = true;
+				break username;
+			}
+			if (!checkUsername(inputs.signup.username)) {
+				signUpError.usernameCheckFail = true;
+				break username;
+			}
 		}
 		if (!checkEmail(inputs.signup.email)) {
 			signUpError.emailCheckFail = true;
 			return;
 		}
+
 		if (
 			!inputs.signup.password.match(
 				/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&,.()/+-])[A-Za-z\d@$!%*?&,.()/+-]{8,}$/
@@ -355,7 +363,15 @@ function checkEmail(str: string) {
 	);
 }
 
-async function reportError(error: any, header: string) {
+function checkUsername(str: string) {
+	return str.match(/^[a-zA-Z0-9_.-]*$/);
+}
+
+async function reportError(
+	error: { code: any; message: any } | undefined,
+	header: string,
+	message = ''
+) {
 	const alert = await alertController.create({
 		header: 'Error',
 		subHeader: header,
