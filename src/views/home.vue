@@ -127,7 +127,7 @@ const center = [41.378360799800085, 2.150300284782486];
 async function checkGPSError() {
 	if (geo.lastError) {
 		await reportError(
-			geo.lastError.code === 1 ? geo.lastError : undefined,
+			geo.lastError.code === 1 ? undefined : geo.lastError,
 			'GPS no disponible',
 			geo.lastError.code === 1
 				? `No s'ha pogut obtenir l'ubicació. Revisa els permisos o estableix una ubicació personalitzada.`
