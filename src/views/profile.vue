@@ -120,12 +120,12 @@
 							autocomplete="new-password"
 							:counter="true"
 							minlength="8"
-							helper-text="8 caràcters com a mínim amb lletres majúscules i minúscules i algun nombre i símbol."
+							helper-text="8 caràcters com a mínim amb lletres majúscules i minúscules i algun nombre."
 							v-model="inputPasswordSignup"
 							:class="{
 								'ion-invalid ion-touched': signUpError.passwordCheckFail,
 							}"
-							error-text="8 caràcters com a mínim amb lletres majúscules i minúscules i algun nombre i símbol."
+							error-text="8 caràcters com a mínim amb lletres majúscules i minúscules i algun nombre."
 						></ion-input>
 					</ion-item>
 					<ion-item>
@@ -294,7 +294,7 @@ function submit() {
 
 		if (
 			!inputs.signup.password.match(
-				/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&,.()/+-])[A-Za-z\d@$!%*?&,.()/+-]{8,}$/
+				/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/
 			)
 		) {
 			signUpError.passwordCheckFail = true;
