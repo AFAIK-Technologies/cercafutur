@@ -143,18 +143,23 @@
 							error-text="Les contrasenyes no són iguals."
 						></ion-input>
 					</ion-item>
-					<!--
+
 					<ion-item>
-						<ion-select placeholder="Selecciona..." label="Rol">
+						<ion-select
+							placeholder="Selecciona..."
+							v-model="inputRoleSignup"
+							label="Rol"
+						>
 							<ion-select-option value="parent">Pare / mare</ion-select-option>
 							<ion-select-option value="student">Alumne</ion-select-option>
 							<ion-select-option value="teacher">Professor</ion-select-option>
 							<ion-select-option value="other">Altres</ion-select-option>
 						</ion-select>
-					</ion-item>--> </ion-list
-				><ion-button style="max-width: 520px" @click="submit">{{
-					section === 'signup' ? 'Crear un compte' : 'Iniciar sessió'
-				}}</ion-button>
+					</ion-item>
+				</ion-list>
+				<ion-button style="max-width: 520px" @click="submit">
+					{{ section === 'signup' ? 'Crear un compte' : 'Iniciar sessió' }}
+				</ion-button>
 			</div>
 		</div>
 		<p>
@@ -184,6 +189,7 @@ import {
 	getCurrentUser,
 	useCurrentUser,
 	useFirebaseAuth,
+	useFirestore,
 	useIsCurrentUserLoaded,
 } from 'vuefire';
 import {
@@ -215,7 +221,7 @@ const inputEmailSignup = ref('');
 const inputUsernameSignup = ref('');
 const inputPasswordSignup = ref('');
 const inputPasswordRepeatSignup = ref('');
-const role = ref('');
+const inputRoleSignup = ref('');
 
 const inputs = reactive({
 	signin: {
@@ -227,6 +233,7 @@ const inputs = reactive({
 		username: inputUsernameSignup,
 		password: inputPasswordSignup,
 		passwordRepeat: inputPasswordRepeatSignup,
+		role: inputRoleSignup,
 	},
 });
 
@@ -306,7 +313,23 @@ function submit(e: CustomEvent) {
 				updateProfile(auth.currentUser, {
 					displayName: inputs.signup.username,
 				})
-					.then(() => {})
+					.then(async () => {
+						if (user.value?.uid) {
+							// Base de dades
+							const userRef = doc(firestore, 'users/' + user.value.uid);
+							await setDoc(userRef, {
+								name: user.value.displayName!,
+								email: user.value.email!,
+								role: inputRoleSignup,
+							});
+						} else {
+							reportError(
+								undefined,
+								'Error en accedir a la base de dades',
+								"L'identificador de l'usuari no està disponible."
+							);
+						}
+					})
 					.catch((error) => {
 						console.log(error);
 						if (error.code === 'auth/invalid-email') {
@@ -336,8 +359,11 @@ async function reportError(error: any, header: string) {
 	const alert = await alertController.create({
 		header: 'Error',
 		subHeader: header,
-		message: `Codi d'error: ${error.code} \n Missatge: ${error.message}`,
-		buttons: ['OK'],
+		message:
+			message +
+				(error &&
+					`Codi d'error: ${error.code} \n Missatge: ${error.message}`) || '',
+		buttons: ["D'acord"],
 	});
 
 	await alert.present();
