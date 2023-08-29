@@ -11,6 +11,7 @@
 				world-copy-jump
 				inertia-deceleration="1000"
 				:options="{ boxZoom: false, attributionControl: false }"
+				style="border-radius: 8px"
 			>
 				<l-tile-layer
 					url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
