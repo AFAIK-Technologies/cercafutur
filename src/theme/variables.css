@@ -6,7 +6,7 @@ http://ionicframework.com/docs/theming/ */
   --ion-background-color: #ffd493;
   --ion-background-color-rgb: 255, 212, 147;
 
-  --ion-toolbar-background: #e7bb7a;
+  --ion-toolbar-background: rgba(231, 187, 122, 0.7);
   --ion-toolbar-background-rgb: 231, 187, 122;
 
   --ion-text-color: #222;

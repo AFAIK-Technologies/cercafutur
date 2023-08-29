@@ -27,4 +27,9 @@ import { IonApp, IonRouterOutlet } from '@ionic/vue';
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
 }
+
+ion-toolbar {
+	backdrop-filter: blur(8px) !important;
+	z-index: 10;
+}
 </style>
