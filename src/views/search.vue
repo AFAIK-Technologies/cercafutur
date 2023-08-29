@@ -1,25 +1,35 @@
 <template>
 	<TabLayout :loading="loading">
-		<ion-searchbar
-			v-model="searchQuery"
-			placeholder="Cerca per nom"
-		></ion-searchbar>
-		<ion-select
-			:label="'Ordena per'"
-			:value="order"
-			@ion-dismiss="handleSortChange"
-		>
-			<ion-select-option
-				v-for="option in orderOptions"
-				:value="option.id"
-				:key="option.id"
-				:disabled="option.id === 'distance' && !geo.data.longitude"
-				>{{ option.show }}
-			</ion-select-option>
-		</ion-select>
-		<div class="schoolgrid">
-			<SchoolComp v-for="school in results" :school="school" :key="school.id" />
-		</div>
+		<template #default>
+			<ion-select
+				:label="'Ordena per'"
+				:value="order"
+				@ion-dismiss="handleSortChange"
+			>
+				<ion-select-option
+					v-for="option in orderOptions"
+					:value="option.id"
+					:key="option.id"
+					:disabled="option.id === 'distance' && !geo.data.longitude"
+					>{{ option.show }}
+				</ion-select-option>
+			</ion-select>
+			<div class="schoolgrid">
+				<SchoolComp
+					v-for="school in results"
+					:school="school"
+					:key="school.id"
+				/>
+			</div>
+		</template>
+		<template #header>
+			<ion-toolbar>
+				<ion-searchbar
+					v-model="searchQuery"
+					placeholder="Cerca per nom"
+				></ion-searchbar>
+			</ion-toolbar>
+		</template>
 	</TabLayout>
 </template>
 
@@ -28,7 +38,7 @@ import TabLayout from '@/layout/tabLayout.vue';
 
 import { School, SchoolFull } from '@/data';
 import SchoolComp from '@/components/schoolComp.vue';
-import { IonSearchbar } from '@ionic/vue';
+import { IonSearchbar, IonToolbar } from '@ionic/vue';
 
 import { ref, Ref, watch } from 'vue';
 import { useSchoolsStore } from '@/stores/schools';

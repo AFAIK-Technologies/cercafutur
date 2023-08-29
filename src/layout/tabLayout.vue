@@ -13,6 +13,7 @@
 					:style="{ display: loading ? 'block' : 'none' }"
 				></ion-progress-bar>
 			</ion-toolbar>
+			<slot name="header"></slot>
 		</ion-header>
 		<ion-content :fullscreen="true">
 			<div style="padding: 1rem 1rem calc(1rem + 56px) 1rem">
